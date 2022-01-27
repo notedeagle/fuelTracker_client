@@ -10,7 +10,6 @@ class IntroPage extends StatefulWidget {
   const IntroPage({Key? key, required this.userRepository}) : super(key: key);
 
   @override
-  // ignore: no_logic_in_create_state
   State<StatefulWidget> createState() => _IntroPageState(userRepository);
 }
 

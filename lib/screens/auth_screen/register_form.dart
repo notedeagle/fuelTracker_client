@@ -2,46 +2,49 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_tracker_client/bloc/login_bloc/login_bloc.dart';
+import 'package:flutter_tracker_client/bloc/register_bloc/register_bloc.dart';
 import 'package:flutter_tracker_client/repositories/repositories.dart';
-import 'package:flutter_tracker_client/screens/auth_screen/register_form.dart';
-import 'package:flutter_tracker_client/screens/auth_screen/register_screen.dart';
 import 'package:flutter_tracker_client/style/theme.dart' as style;
 
-class LoginForm extends StatefulWidget {
+class RegisterForm extends StatefulWidget {
   final UserRepository userRepository;
-  const LoginForm({Key? key, required this.userRepository}) : super(key: key);
+  const RegisterForm({Key? key, required this.userRepository})
+      : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _LoginFormState(userRepository);
+  State<StatefulWidget> createState() => _RegisterFormState(userRepository);
 }
 
-class _LoginFormState extends State<LoginForm> {
+class _RegisterFormState extends State<RegisterForm> {
   final UserRepository userRepository;
-  _LoginFormState(this.userRepository);
+  _RegisterFormState(this.userRepository);
   final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
   final _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    _onLoginButtonPressed() {
-      BlocProvider.of<LoginBloc>(context).add(LoginButtonPressed(
+    _onRegisterButtonPressed() {
+      BlocProvider.of<RegisterBloc>(context).add(RegisterButtonPressed(
           username: _usernameController.text,
+          email: _emailController.text,
+          firstName: _firstNameController.text,
+          lastName: _lastNameController.text,
           password: _passwordController.text));
     }
 
-    return BlocListener<LoginBloc, LoginState>(
+    return BlocListener<RegisterBloc, RegisterState>(
       listener: (context, state) {
-        if (state is LoginFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Login failed."),
-              backgroundColor: Colors.red,
-            ),
-          );
+        if (state is RegisterFailure) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Registartion failed."),
+            backgroundColor: Colors.red,
+          ));
         }
       },
-      child: BlocBuilder<LoginBloc, LoginState>(
+      child: BlocBuilder<RegisterBloc, RegisterState>(
         builder: (context, state) {
           return Padding(
             padding: const EdgeInsets.only(right: 20.0, left: 20.0, top: 80.0),
@@ -49,28 +52,21 @@ class _LoginFormState extends State<LoginForm> {
               child: Column(
                 children: [
                   Container(
-                      height: 200.0,
-                      padding: const EdgeInsets.only(bottom: 20.0, top: 40.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Text(
-                            "FUEL TRACKER",
-                            style: TextStyle(
-                                color: style.Colors.mainColor,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 24.0),
-                          ),
-                          SizedBox(
-                            height: 5.0,
-                          ),
-                          Text(
-                            "Login",
-                            style: TextStyle(
-                                fontSize: 10.0, color: Colors.black38),
-                          )
-                        ],
-                      )),
+                    height: 100.0,
+                    padding: const EdgeInsets.only(bottom: 20.0, top: 10.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text(
+                          "REGISTER NEW ACCOUNT",
+                          style: TextStyle(
+                              color: style.Colors.mainColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 24.0),
+                        ),
+                      ],
+                    ),
+                  ),
                   const SizedBox(
                     height: 30.0,
                   ),
@@ -79,8 +75,8 @@ class _LoginFormState extends State<LoginForm> {
                         fontSize: 14.0,
                         color: style.Colors.titleColor,
                         fontWeight: FontWeight.bold),
-                    controller: _usernameController,
-                    keyboardType: TextInputType.name,
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(EvaIcons.emailOutline,
                           color: Colors.black26),
@@ -93,7 +89,118 @@ class _LoginFormState extends State<LoginForm> {
                           borderRadius: BorderRadius.circular(30.0)),
                       contentPadding:
                           const EdgeInsets.only(left: 10.0, right: 10.0),
+                      labelText: "Email address",
+                      hintStyle: const TextStyle(
+                          fontSize: 12.0,
+                          color: style.Colors.grey,
+                          fontWeight: FontWeight.w500),
+                      labelStyle: const TextStyle(
+                          fontSize: 12.0,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500),
+                    ),
+                    autocorrect: false,
+                  ),
+                  const SizedBox(
+                    height: 20.0,
+                  ),
+                  TextFormField(
+                    style: const TextStyle(
+                        fontSize: 14.0,
+                        color: style.Colors.titleColor,
+                        fontWeight: FontWeight.bold),
+                    controller: _usernameController,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(
+                      fillColor: Colors.white,
+                      prefixIcon: const Icon(
+                        EvaIcons.text,
+                        color: Colors.black26,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: Colors.black12),
+                          borderRadius: BorderRadius.circular(30.0)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              const BorderSide(color: style.Colors.mainColor),
+                          borderRadius: BorderRadius.circular(30.0)),
+                      contentPadding:
+                          const EdgeInsets.only(left: 10.0, right: 10.0),
                       labelText: "Username",
+                      hintStyle: const TextStyle(
+                          fontSize: 12.0,
+                          color: style.Colors.grey,
+                          fontWeight: FontWeight.w500),
+                      labelStyle: const TextStyle(
+                          fontSize: 12.0,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500),
+                    ),
+                    autocorrect: false,
+                  ),
+                  const SizedBox(
+                    height: 20.0,
+                  ),
+                  TextFormField(
+                    style: const TextStyle(
+                        fontSize: 14.0,
+                        color: style.Colors.titleColor,
+                        fontWeight: FontWeight.bold),
+                    controller: _firstNameController,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(
+                      fillColor: Colors.white,
+                      prefixIcon: const Icon(
+                        EvaIcons.lockOutline,
+                        color: Colors.black26,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: Colors.black12),
+                          borderRadius: BorderRadius.circular(30.0)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              const BorderSide(color: style.Colors.mainColor),
+                          borderRadius: BorderRadius.circular(30.0)),
+                      contentPadding:
+                          const EdgeInsets.only(left: 10.0, right: 10.0),
+                      labelText: "First name",
+                      hintStyle: const TextStyle(
+                          fontSize: 12.0,
+                          color: style.Colors.grey,
+                          fontWeight: FontWeight.w500),
+                      labelStyle: const TextStyle(
+                          fontSize: 12.0,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500),
+                    ),
+                    autocorrect: false,
+                  ),
+                  const SizedBox(
+                    height: 20.0,
+                  ),
+                  TextFormField(
+                    style: const TextStyle(
+                        fontSize: 14.0,
+                        color: style.Colors.titleColor,
+                        fontWeight: FontWeight.bold),
+                    controller: _lastNameController,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(
+                      fillColor: Colors.white,
+                      prefixIcon: const Icon(
+                        EvaIcons.lockOutline,
+                        color: Colors.black26,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: Colors.black12),
+                          borderRadius: BorderRadius.circular(30.0)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              const BorderSide(color: style.Colors.mainColor),
+                          borderRadius: BorderRadius.circular(30.0)),
+                      contentPadding:
+                          const EdgeInsets.only(left: 10.0, right: 10.0),
+                      labelText: "Last name",
                       hintStyle: const TextStyle(
                           fontSize: 12.0,
                           color: style.Colors.grey,
@@ -162,7 +269,7 @@ class _LoginFormState extends State<LoginForm> {
                       children: <Widget>[
                         SizedBox(
                             height: 45,
-                            child: state is LoginLoading
+                            child: state is RegisterLoading
                                 ? Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
@@ -189,8 +296,8 @@ class _LoginFormState extends State<LoginForm> {
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(30.0),
                                     ),
-                                    onPressed: _onLoginButtonPressed,
-                                    child: const Text("LOG IN",
+                                    onPressed: _onRegisterButtonPressed,
+                                    child: const Text("REGISTER",
                                         style: TextStyle(
                                             fontSize: 12.0,
                                             fontWeight: FontWeight.bold,
@@ -218,24 +325,16 @@ class _LoginFormState extends State<LoginForm> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
                               const Text(
-                                "Don't have an account?",
+                                "Already have an account?",
                                 style: TextStyle(color: style.Colors.grey),
                               ),
                               const Padding(
                                 padding: EdgeInsets.only(right: 5.0),
                               ),
                               GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                RegisterScreen(
-                                                    userRepository:
-                                                        userRepository)));
-                                  },
+                                  onTap: () {},
                                   child: const Text(
-                                    "Register",
+                                    "Log in",
                                     style: TextStyle(
                                         color: style.Colors.mainColor,
                                         fontWeight: FontWeight.bold),
@@ -244,9 +343,6 @@ class _LoginFormState extends State<LoginForm> {
                           )),
                     ),
                   ),
-                  const SizedBox(
-                    height: 20.0,
-                  )
                 ],
               ),
             ),
