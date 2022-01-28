@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tracker_client/bloc/register_bloc/register_bloc.dart';
 import 'package:flutter_tracker_client/repositories/repositories.dart';
+import 'package:flutter_tracker_client/screens/auth_screen/login_screen.dart';
 import 'package:flutter_tracker_client/style/theme.dart' as style;
 
 class RegisterForm extends StatefulWidget {
@@ -38,10 +39,18 @@ class _RegisterFormState extends State<RegisterForm> {
     return BlocListener<RegisterBloc, RegisterState>(
       listener: (context, state) {
         if (state is RegisterFailure) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(state.toString()), backgroundColor: Colors.red));
+        }
+        if (state is RegisterInitial) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Registartion failed."),
-            backgroundColor: Colors.red,
-          ));
+              content: Text("Registartion successfull."),
+              backgroundColor: Colors.green));
+          Navigator.pop(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      LoginScreen(userRepository: userRepository)));
         }
       },
       child: BlocBuilder<RegisterBloc, RegisterState>(
@@ -332,7 +341,14 @@ class _RegisterFormState extends State<RegisterForm> {
                                 padding: EdgeInsets.only(right: 5.0),
                               ),
                               GestureDetector(
-                                  onTap: () {},
+                                  onTap: () {
+                                    Navigator.pop(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => LoginScreen(
+                                                userRepository:
+                                                    userRepository)));
+                                  },
                                   child: const Text(
                                     "Log in",
                                     style: TextStyle(

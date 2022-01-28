@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tracker_client/bloc/login_bloc/login_bloc.dart';
 import 'package:flutter_tracker_client/repositories/repositories.dart';
-import 'package:flutter_tracker_client/screens/auth_screen/register_form.dart';
 import 'package:flutter_tracker_client/screens/auth_screen/register_screen.dart';
 import 'package:flutter_tracker_client/style/theme.dart' as style;
 
@@ -19,15 +18,14 @@ class LoginForm extends StatefulWidget {
 class _LoginFormState extends State<LoginForm> {
   final UserRepository userRepository;
   _LoginFormState(this.userRepository);
-  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     _onLoginButtonPressed() {
       BlocProvider.of<LoginBloc>(context).add(LoginButtonPressed(
-          username: _usernameController.text,
-          password: _passwordController.text));
+          email: _emailController.text, password: _passwordController.text));
     }
 
     return BlocListener<LoginBloc, LoginState>(
@@ -79,7 +77,7 @@ class _LoginFormState extends State<LoginForm> {
                         fontSize: 14.0,
                         color: style.Colors.titleColor,
                         fontWeight: FontWeight.bold),
-                    controller: _usernameController,
+                    controller: _emailController,
                     keyboardType: TextInputType.name,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(EvaIcons.emailOutline,
@@ -93,7 +91,7 @@ class _LoginFormState extends State<LoginForm> {
                           borderRadius: BorderRadius.circular(30.0)),
                       contentPadding:
                           const EdgeInsets.only(left: 10.0, right: 10.0),
-                      labelText: "Username",
+                      labelText: "Email address",
                       hintStyle: const TextStyle(
                           fontSize: 12.0,
                           color: style.Colors.grey,

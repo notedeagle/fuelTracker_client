@@ -20,5 +20,5 @@ class RegisterFailure extends RegisterState {
   List<Object> get props => [error];
 
   @override
-  String toString() => 'RegisterFailure {error: $error}';
+  String toString() => 'RegisterFailure: $error';
 }
