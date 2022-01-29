@@ -43,6 +43,9 @@ dependencies:
   introduction_screen: ^2.1.0
   flutter_svg: ^1.0.3
   eva_icons_flutter: ^3.0.2
+  decimal: ^2.1.0
+  http: ^0.13.4
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:

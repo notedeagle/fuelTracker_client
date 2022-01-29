@@ -261,16 +261,6 @@ class _RegisterFormState extends State<RegisterForm> {
                   const SizedBox(
                     height: 30.0,
                   ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: InkWell(
-                        child: const Text(
-                          "Forget password?",
-                          style:
-                              TextStyle(color: Colors.black45, fontSize: 12.0),
-                        ),
-                        onTap: () {}),
-                  ),
                   Padding(
                     padding: const EdgeInsets.only(top: 30.0, bottom: 20.0),
                     child: Column(

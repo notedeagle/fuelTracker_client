@@ -1,15 +1,20 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_tracker_client/bloc/auth_bloc/auth.dart';
+import 'package:flutter_tracker_client/bloc/auth_bloc/auth_bloc.dart';
+import 'package:flutter_tracker_client/dto/refuel_dto.dart';
+import 'package:http/http.dart' as http;
+
+String mainUrl = "http://localhost:8081";
+final Dio _dio = Dio();
+const FlutterSecureStorage storage = FlutterSecureStorage();
 
 class UserRepository {
-  static String mainUrl = "http://localhost:8081";
   var loginUrl = '$mainUrl/login';
   var registerUrl = '$mainUrl/register';
-
-  final FlutterSecureStorage storage = const FlutterSecureStorage();
-  final Dio _dio = Dio();
 
   Future<bool> hasToken() async {
     var value = await storage.read(key: 'token');
@@ -39,7 +44,7 @@ class UserRepository {
 
   Future<Response> register(String email, String firstName, String lastName,
       String username, String password) async {
-    Response response = await _dio.post(registerUrl,
+    return await _dio.post(registerUrl,
         data: {
           "email": email,
           "firstName": firstName,
@@ -53,7 +58,24 @@ class UserRepository {
             return status! < 500;
           },
         ));
+  }
+}
 
-    return response;
+class RefuelRepository {
+  late LoggedIn loggedIn;
+  var refuelByCarName = '$mainUrl/refuel/';
+
+  Future<List<RefuelDto>> getRefuelByCarName(String carName) async {
+    var value = await storage.read(key: 'token');
+
+    final response = await http.get(Uri.parse(refuelByCarName + carName),
+        headers: {HttpHeaders.authorizationHeader: "$value"});
+
+    if (response.statusCode == 200) {
+      List jsonResponse = jsonDecode(response.body);
+      return jsonResponse.map((data) => RefuelDto.fromJson(data)).toList();
+    } else {
+      throw Exception('Could not find refuel data for this car');
+    }
   }
 }

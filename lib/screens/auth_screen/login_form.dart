@@ -46,9 +46,8 @@ class _LoginFormState extends State<LoginForm> {
             child: Form(
               child: Column(
                 children: [
-                  Container(
+                  SizedBox(
                       height: 200.0,
-                      padding: const EdgeInsets.only(bottom: 20.0, top: 40.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [
@@ -62,11 +61,6 @@ class _LoginFormState extends State<LoginForm> {
                           SizedBox(
                             height: 5.0,
                           ),
-                          Text(
-                            "Login",
-                            style: TextStyle(
-                                fontSize: 10.0, color: Colors.black38),
-                          )
                         ],
                       )),
                   const SizedBox(
@@ -147,7 +141,7 @@ class _LoginFormState extends State<LoginForm> {
                     alignment: Alignment.centerRight,
                     child: InkWell(
                         child: const Text(
-                          "Forget password?",
+                          "", //for forget password
                           style:
                               TextStyle(color: Colors.black45, fontSize: 12.0),
                         ),
