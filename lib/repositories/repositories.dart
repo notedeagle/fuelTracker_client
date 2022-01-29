@@ -6,6 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class UserRepository {
   static String mainUrl = "http://localhost:8081";
   var loginUrl = '$mainUrl/login';
+  var registerUrl = '$mainUrl/register';
 
   final FlutterSecureStorage storage = const FlutterSecureStorage();
   final Dio _dio = Dio();
@@ -28,11 +29,31 @@ class UserRepository {
     storage.deleteAll();
   }
 
-  Future<String> login(String username, String password) async {
+  Future<String> login(String email, String password) async {
     Response response = await _dio.post(loginUrl, data: {
-      "username": username,
+      "email": email,
       "password": password,
     });
     return response.headers.value(HttpHeaders.authorizationHeader).toString();
+  }
+
+  Future<Response> register(String email, String firstName, String lastName,
+      String username, String password) async {
+    Response response = await _dio.post(registerUrl,
+        data: {
+          "email": email,
+          "firstName": firstName,
+          "lastName": lastName,
+          "username": username,
+          "password": password
+        },
+        options: Options(
+          followRedirects: false,
+          validateStatus: (status) {
+            return status! < 500;
+          },
+        ));
+
+    return response;
   }
 }
