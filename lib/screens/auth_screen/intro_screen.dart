@@ -47,7 +47,7 @@ class _IntroPageState extends State<IntroPage> {
             ],
           ),
         ),
-        body: "fuel log, mileage and costs tracker.",
+        body: "Fuel log, mileage and costs tracker.",
         // image: Center(child: SvgPicture.asset("assets/icons/fuel-15.svg")),
         decoration: const PageDecoration(
             pageColor: Colors.white,
