@@ -26,9 +26,4 @@ class RefuelDto {
         totalCost: json['totalCost'] as double,
         price: json['price'] as double);
   }
-
-  @override
-  String toString() {
-    return '{ $date, $fuel, $fullTank, $litres, $odometer, $totalCost}';
-  }
 }

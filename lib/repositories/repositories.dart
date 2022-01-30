@@ -3,9 +3,8 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_tracker_client/bloc/auth_bloc/auth.dart';
-import 'package:flutter_tracker_client/bloc/auth_bloc/auth_bloc.dart';
 import 'package:flutter_tracker_client/dto/refuel_dto.dart';
+import 'package:flutter_tracker_client/dto/vehicle_dto.dart';
 import 'package:http/http.dart' as http;
 
 String mainUrl = "http://localhost:8081";
@@ -62,20 +61,37 @@ class UserRepository {
 }
 
 class RefuelRepository {
-  late LoggedIn loggedIn;
   var refuelByCarName = '$mainUrl/refuel/';
 
   Future<List<RefuelDto>> getRefuelByCarName(String carName) async {
-    var value = await storage.read(key: 'token');
+    var token = await storage.read(key: 'token');
 
     final response = await http.get(Uri.parse(refuelByCarName + carName),
-        headers: {HttpHeaders.authorizationHeader: "$value"});
+        headers: {HttpHeaders.authorizationHeader: "$token"});
 
     if (response.statusCode == 200) {
       List jsonResponse = jsonDecode(response.body);
       return jsonResponse.map((data) => RefuelDto.fromJson(data)).toList();
     } else {
       throw Exception('Could not find refuel data for this car');
+    }
+  }
+}
+
+class VehicleRepository {
+  var customerVehicles = '$mainUrl/vehicle/user';
+
+  Future<List<VehicleDto>> getCustomerVehicles() async {
+    var token = await storage.read(key: 'token');
+
+    final response = await http.get(Uri.parse(customerVehicles),
+        headers: {HttpHeaders.authorizationHeader: "$token"});
+
+    if (response.statusCode == 200) {
+      List jsonResponse = jsonDecode(response.body);
+      return jsonResponse.map((data) => VehicleDto.fromJson(data)).toList();
+    } else {
+      throw Exception('Could not find vehicle for this customer');
     }
   }
 }
