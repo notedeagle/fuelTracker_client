@@ -72,8 +72,10 @@ class RefuelRepository {
     if (response.statusCode == 200) {
       List jsonResponse = jsonDecode(response.body);
       return jsonResponse.map((data) => RefuelDto.fromJson(data)).toList();
+    } else if (response.statusCode == 404) {
+      return List.empty();
     } else {
-      throw Exception('Could not find refuel data for this car');
+      throw Exception("Error occured");
     }
   }
 }
@@ -90,8 +92,10 @@ class VehicleRepository {
     if (response.statusCode == 200) {
       List jsonResponse = jsonDecode(response.body);
       return jsonResponse.map((data) => VehicleDto.fromJson(data)).toList();
+    } else if (response.statusCode == 204) {
+      return List.empty();
     } else {
-      throw Exception('Could not find vehicle for this customer');
+      throw Exception("Error.");
     }
   }
 }
