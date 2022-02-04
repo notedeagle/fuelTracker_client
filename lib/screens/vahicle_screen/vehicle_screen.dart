@@ -8,6 +8,8 @@ import 'package:flutter_tracker_client/repositories/repositories.dart';
 import 'package:flutter_tracker_client/style/theme.dart' as style;
 
 class VehicleScreen extends StatefulWidget {
+  const VehicleScreen({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => _VehicleScreenState();
 }
@@ -26,20 +28,11 @@ class _VehicleScreenState extends State<VehicleScreen> {
                 title: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: const [
-                    SizedBox(width: 15),
+                    SizedBox(width: 62),
                     Text("Fuel tracker"),
                   ],
                 ),
                 actions: [
-                  IconButton(
-                    icon: const Icon(EvaIcons.fileAdd),
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (conext) => VehicleScreen()));
-                    },
-                  ),
                   IconButton(
                       icon: const Icon(EvaIcons.logOutOutline),
                       onPressed: () {
