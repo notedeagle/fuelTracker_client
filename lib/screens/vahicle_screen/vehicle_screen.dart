@@ -24,24 +24,14 @@ class _VehicleScreenState extends State<VehicleScreen> {
         builder: (context, snapshot) {
           return Scaffold(
               appBar: AppBar(
-                backgroundColor: style.Colors.mainColor,
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: const [
-                    SizedBox(width: 62),
-                    Text("Fuel tracker"),
-                  ],
-                ),
-                actions: [
-                  IconButton(
-                      icon: const Icon(EvaIcons.logOutOutline),
-                      onPressed: () {
-                        BlocProvider.of<AuthenticationBloc>(context).add(
-                          LoggedOut(),
-                        );
-                      }),
-                ],
-              ),
+                  backgroundColor: style.Colors.mainColor,
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: const [
+                      SizedBox(width: 62),
+                      Text("Fuel tracker"),
+                    ],
+                  )),
               body: Center(
                   child: FutureBuilder<List<VehicleDto>>(
                 future: VehicleRepository().getCustomerVehicles(),
@@ -84,11 +74,23 @@ class _VehicleScreenState extends State<VehicleScreen> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
+                                              data[index].name,
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 14.0),
+                                            ),
+                                            Text(
                                               data[index].brand,
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 14.0),
                                             ),
+                                            Text(
+                                              data[index].model,
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 14.0),
+                                            )
                                           ],
                                         ),
                                       ),
@@ -100,39 +102,14 @@ class _VehicleScreenState extends State<VehicleScreen> {
                                         child: Column(
                                           children: [
                                             Text(
-                                              data[index].mileage.toString(),
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 14.0),
-                                            ),
-                                            Text(
-                                              data[index].model,
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 14.0),
-                                            ),
-                                            Text(
-                                              data[index].name,
+                                              data[index].mileage.toString() +
+                                                  " km",
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 14.0),
                                             ),
                                             Text(
                                               data[index].plateNumber,
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 14.0),
-                                            ),
-                                            Text(
-                                              data[index]
-                                                  .registartionYear
-                                                  .toString(),
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 14.0),
-                                            ),
-                                            Text(
-                                              data[index].vehicleType,
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 14.0),
@@ -157,7 +134,14 @@ class _VehicleScreenState extends State<VehicleScreen> {
 
                   return const CircularProgressIndicator();
                 },
-              )));
+              )),
+              floatingActionButton: FloatingActionButton.extended(
+                  onPressed: () {}, //Add Navigator
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add'),
+                  backgroundColor: style.Colors.mainColor),
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.centerFloat);
         });
   }
 }

@@ -70,7 +70,7 @@ class _MainScreenState extends State<MainScreen> {
                                   style: const TextStyle(color: Colors.black)),
                             );
                           }).toList()),
-                      const SizedBox(width: 15),
+                      const SizedBox(width: 30),
                       const Text("Fuel tracker"),
                     ],
                   ),
@@ -81,7 +81,7 @@ class _MainScreenState extends State<MainScreen> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (conext) => VehicleScreen()));
+                                builder: (conext) => const VehicleScreen()));
                       },
                     ),
                     IconButton(
@@ -139,6 +139,12 @@ class _MainScreenState extends State<MainScreen> {
                                                 DateFormat(
                                                         'dd-MM-yyyy\nHH:mm:ss')
                                                     .format(data[index].date),
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 14.0),
+                                              ),
+                                              Text(
+                                                vehicleValue,
                                                 style: const TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 14.0),
@@ -201,7 +207,14 @@ class _MainScreenState extends State<MainScreen> {
 
                     return const CircularProgressIndicator();
                   },
-                )));
+                )),
+                floatingActionButton: FloatingActionButton.extended(
+                    onPressed: () {}, //Add Navigator
+                    icon: const Icon(Icons.add),
+                    label: const Text('Add'),
+                    backgroundColor: style.Colors.mainColor),
+                floatingActionButtonLocation:
+                    FloatingActionButtonLocation.centerFloat);
           } else {
             return Scaffold(
                 appBar: AppBar(
@@ -214,7 +227,8 @@ class _MainScreenState extends State<MainScreen> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => VehicleScreen()));
+                                    builder: (context) =>
+                                        const VehicleScreen()));
                           },
                           icon: const Icon(EvaIcons.fileAdd)),
                       const SizedBox(width: 55),
