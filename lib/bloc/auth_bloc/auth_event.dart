@@ -14,6 +14,10 @@ class LoggedIn extends AuthenticationEvent {
 
   const LoggedIn({required this.token});
 
+  String getToken() {
+    return token;
+  }
+
   @override
   List<Object> get props => [token];
 

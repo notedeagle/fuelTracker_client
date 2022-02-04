@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Colors {
-  static const Color mainColor = Color(0xFF6584F7);
+  static const Color mainColor = Color(0xFF007CFF);
   static const Color background = Color(0xFFf2f6ff);
   static const Color loginGradientStart = Color(0xFF59499E);
   static const Color loginGradientEnd = Color(0xFF59499E);

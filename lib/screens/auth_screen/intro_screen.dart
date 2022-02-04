@@ -26,25 +26,28 @@ class _IntroPageState extends State<IntroPage> {
 
   final List<PageViewModel> pages = [
     PageViewModel(
-        titleWidget: Column(
-          children: <Widget>[
-            const Text(
-              'Fuel tracker',
-              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            Container(
-              height: 3,
-              width: 100,
-              decoration: BoxDecoration(
-                  color: style.Colors.mainColor,
-                  borderRadius: BorderRadius.circular(10)),
-            )
-          ],
+        titleWidget: Container(
+          padding: const EdgeInsets.only(top: 50),
+          child: Column(
+            children: <Widget>[
+              const Text(
+                'Fuel tracker',
+                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(
+                height: 8,
+              ),
+              Container(
+                height: 3,
+                width: 100,
+                decoration: BoxDecoration(
+                    color: style.Colors.mainColor,
+                    borderRadius: BorderRadius.circular(10)),
+              )
+            ],
+          ),
         ),
-        body: "fuel log, mileage and costs tracker.",
+        body: "Fuel log, mileage and costs tracker.",
         // image: Center(child: SvgPicture.asset("assets/icons/fuel-15.svg")),
         decoration: const PageDecoration(
             pageColor: Colors.white,

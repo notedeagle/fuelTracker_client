@@ -20,12 +20,17 @@ class _LoginFormState extends State<LoginForm> {
   _LoginFormState(this.userRepository);
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final regEmail = RegExp(
+      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
 
   @override
   Widget build(BuildContext context) {
     _onLoginButtonPressed() {
-      BlocProvider.of<LoginBloc>(context).add(LoginButtonPressed(
-          email: _emailController.text, password: _passwordController.text));
+      if (_formKey.currentState!.validate()) {
+        BlocProvider.of<LoginBloc>(context).add(LoginButtonPressed(
+            email: _emailController.text, password: _passwordController.text));
+      }
     }
 
     return BlocListener<LoginBloc, LoginState>(
@@ -44,11 +49,11 @@ class _LoginFormState extends State<LoginForm> {
           return Padding(
             padding: const EdgeInsets.only(right: 20.0, left: 20.0, top: 80.0),
             child: Form(
+              key: _formKey,
               child: Column(
                 children: [
-                  Container(
+                  SizedBox(
                       height: 200.0,
-                      padding: const EdgeInsets.only(bottom: 20.0, top: 40.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [
@@ -62,11 +67,6 @@ class _LoginFormState extends State<LoginForm> {
                           SizedBox(
                             height: 5.0,
                           ),
-                          Text(
-                            "Login",
-                            style: TextStyle(
-                                fontSize: 10.0, color: Colors.black38),
-                          )
                         ],
                       )),
                   const SizedBox(
@@ -101,6 +101,13 @@ class _LoginFormState extends State<LoginForm> {
                           color: Colors.grey,
                           fontWeight: FontWeight.w500),
                     ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return "Email cannot be blank.";
+                      } else if (!regEmail.hasMatch(value)) {
+                        return "Incorrect email";
+                      }
+                    },
                     autocorrect: false,
                   ),
                   const SizedBox(
@@ -137,6 +144,8 @@ class _LoginFormState extends State<LoginForm> {
                           color: Colors.grey,
                           fontWeight: FontWeight.w500),
                     ),
+                    validator: (value) =>
+                        value!.isEmpty ? "Password cannot be blank." : null,
                     autocorrect: false,
                     obscureText: true,
                   ),
@@ -147,7 +156,7 @@ class _LoginFormState extends State<LoginForm> {
                     alignment: Alignment.centerRight,
                     child: InkWell(
                         child: const Text(
-                          "Forget password?",
+                          "", //for forget password
                           style:
                               TextStyle(color: Colors.black45, fontSize: 12.0),
                         ),
