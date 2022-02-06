@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tracker_client/bloc/vehicle_bloc/vehicle_bloc.dart';
 import 'package:flutter_tracker_client/repositories/repositories.dart';
 import 'package:flutter_tracker_client/screens/main_screen/main_screen.dart';
-import 'package:flutter_tracker_client/screens/vahicle_screen/vehicle_screen.dart';
 import 'package:flutter_tracker_client/style/theme.dart' as style;
 
 class VehicleForm extends StatefulWidget {
@@ -14,6 +13,7 @@ class VehicleForm extends StatefulWidget {
       : super(key: key);
 
   @override
+  // ignore: no_logic_in_create_state
   State<StatefulWidget> createState() => _VehicleFormState(vehicleRepository);
 }
 
@@ -27,7 +27,6 @@ class _VehicleFormState extends State<VehicleForm> {
   final _modelController = TextEditingController();
   final _nameController = TextEditingController();
   final _plateNumberController = TextEditingController();
-  final _registrationController = TextEditingController();
   final _vehicleType = TextEditingController();
   final _productionYear = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -42,7 +41,6 @@ class _VehicleFormState extends State<VehicleForm> {
             model: _modelController.text,
             name: _nameController.text,
             plateNumber: _plateNumberController.text,
-            registrationYear: _registrationController.text,
             vehicleType: _vehicleType.text,
             yearOfProduction: _productionYear.text));
       }
@@ -97,7 +95,7 @@ class _VehicleFormState extends State<VehicleForm> {
                     controller: _brandController,
                     keyboardType: TextInputType.text,
                     decoration: InputDecoration(
-                      prefixIcon: const Icon(EvaIcons.emailOutline,
+                      prefixIcon: const Icon(EvaIcons.carOutline,
                           color: Colors.black26),
                       enabledBorder: OutlineInputBorder(
                           borderSide: const BorderSide(color: Colors.black12),
@@ -138,7 +136,7 @@ class _VehicleFormState extends State<VehicleForm> {
                     decoration: InputDecoration(
                       fillColor: Colors.white,
                       prefixIcon: const Icon(
-                        EvaIcons.personOutline,
+                        EvaIcons.carOutline,
                         color: Colors.black26,
                       ),
                       enabledBorder: OutlineInputBorder(
@@ -177,7 +175,7 @@ class _VehicleFormState extends State<VehicleForm> {
                     decoration: InputDecoration(
                       fillColor: Colors.white,
                       prefixIcon: const Icon(
-                        EvaIcons.personOutline,
+                        EvaIcons.carOutline,
                         color: Colors.black26,
                       ),
                       enabledBorder: OutlineInputBorder(
@@ -216,7 +214,7 @@ class _VehicleFormState extends State<VehicleForm> {
                     decoration: InputDecoration(
                       fillColor: Colors.white,
                       prefixIcon: const Icon(
-                        EvaIcons.personOutline,
+                        EvaIcons.carOutline,
                         color: Colors.black26,
                       ),
                       enabledBorder: OutlineInputBorder(
@@ -246,44 +244,83 @@ class _VehicleFormState extends State<VehicleForm> {
                     height: 20.0,
                   ),
                   TextFormField(
-                    style: const TextStyle(
-                        fontSize: 14.0,
-                        color: style.Colors.titleColor,
-                        fontWeight: FontWeight.bold),
-                    controller: _plateNumberController,
-                    decoration: InputDecoration(
-                      fillColor: Colors.white,
-                      prefixIcon: const Icon(
-                        EvaIcons.lockOutline,
-                        color: Colors.black26,
+                      style: const TextStyle(
+                          fontSize: 14.0,
+                          color: style.Colors.titleColor,
+                          fontWeight: FontWeight.bold),
+                      controller: _productionYear,
+                      keyboardType: const TextInputType.numberWithOptions(),
+                      decoration: InputDecoration(
+                        fillColor: Colors.white,
+                        prefixIcon: const Icon(
+                          EvaIcons.carOutline,
+                          color: Colors.black26,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(color: Colors.black12),
+                            borderRadius: BorderRadius.circular(30.0)),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: style.Colors.mainColor),
+                            borderRadius: BorderRadius.circular(30.0)),
+                        contentPadding:
+                            const EdgeInsets.only(left: 10.0, right: 10.0),
+                        labelText: "Production year",
+                        hintStyle: const TextStyle(
+                            fontSize: 12.0,
+                            color: style.Colors.grey,
+                            fontWeight: FontWeight.w500),
+                        labelStyle: const TextStyle(
+                            fontSize: 12.0,
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w500),
                       ),
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Colors.black12),
-                          borderRadius: BorderRadius.circular(30.0)),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(color: style.Colors.mainColor),
-                          borderRadius: BorderRadius.circular(30.0)),
-                      contentPadding:
-                          const EdgeInsets.only(left: 10.0, right: 10.0),
-                      labelText: "Plate number",
-                      hintStyle: const TextStyle(
-                          fontSize: 12.0,
-                          color: style.Colors.grey,
-                          fontWeight: FontWeight.w500),
-                      labelStyle: const TextStyle(
-                          fontSize: 12.0,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return "PLate number cannot be blank.";
-                      }
-                    },
-                    autocorrect: false,
-                    obscureText: true,
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return "Production year cannot be blank.";
+                        }
+                      },
+                      autocorrect: false),
+                  const SizedBox(
+                    height: 20.0,
                   ),
+                  TextFormField(
+                      style: const TextStyle(
+                          fontSize: 14.0,
+                          color: style.Colors.titleColor,
+                          fontWeight: FontWeight.bold),
+                      controller: _plateNumberController,
+                      decoration: InputDecoration(
+                        fillColor: Colors.white,
+                        prefixIcon: const Icon(
+                          EvaIcons.carOutline,
+                          color: Colors.black26,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(color: Colors.black12),
+                            borderRadius: BorderRadius.circular(30.0)),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: style.Colors.mainColor),
+                            borderRadius: BorderRadius.circular(30.0)),
+                        contentPadding:
+                            const EdgeInsets.only(left: 10.0, right: 10.0),
+                        labelText: "Plate number",
+                        hintStyle: const TextStyle(
+                            fontSize: 12.0,
+                            color: style.Colors.grey,
+                            fontWeight: FontWeight.w500),
+                        labelStyle: const TextStyle(
+                            fontSize: 12.0,
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w500),
+                      ),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return "Plate number cannot be blank.";
+                        }
+                      },
+                      autocorrect: false),
                   const SizedBox(
                     height: 30.0,
                   ),

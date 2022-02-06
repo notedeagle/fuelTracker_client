@@ -4,7 +4,6 @@ class VehicleDto {
   String model;
   String name;
   String plateNumber;
-  int registartionYear;
   String vehicleType;
   int yearOfProduction;
 
@@ -14,7 +13,6 @@ class VehicleDto {
       required this.model,
       required this.name,
       required this.plateNumber,
-      required this.registartionYear,
       required this.vehicleType,
       required this.yearOfProduction});
 
@@ -25,7 +23,6 @@ class VehicleDto {
         model: json['model'] as String,
         name: json['name'] as String,
         plateNumber: json['plateNumber'] as String,
-        registartionYear: json['registrationYear'] as int,
         vehicleType: json['vehicleType'] as String,
         yearOfProduction: json['yearOfProduction'] as int);
   }

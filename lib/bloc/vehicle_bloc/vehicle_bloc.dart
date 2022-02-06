@@ -1,8 +1,6 @@
-import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tracker_client/repositories/repositories.dart';
-import 'package:http/src/response.dart';
 
 part 'vehicle_state.dart';
 part 'vehicle_event.dart';
@@ -24,7 +22,6 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
             event.model,
             event.name,
             event.plateNumber,
-            event.registrationYear,
             event.vehicleType,
             event.yearOfProduction);
 

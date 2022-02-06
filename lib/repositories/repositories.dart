@@ -105,7 +105,6 @@ class VehicleRepository {
       String model,
       String name,
       String plateNumber,
-      String registrationYear,
       String vehicleType,
       String yearOfProduction) async {
     var token = await storage.read(key: 'token');
@@ -117,9 +116,8 @@ class VehicleRepository {
           "model": model,
           "name": name,
           "plateNumber": plateNumber,
-          "registrationYear": 2004,
           "vehicleType": "PETROL",
-          "yearOfProduction": 2004
+          "yearOfProduction": yearOfProduction
         }),
         headers: {
           HttpHeaders.authorizationHeader: "$token",
