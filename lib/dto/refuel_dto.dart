@@ -1,4 +1,5 @@
 class RefuelDto {
+  int id;
   DateTime date;
   String fuel;
   bool fullTank;
@@ -8,7 +9,8 @@ class RefuelDto {
   double totalCost;
 
   RefuelDto(
-      {required this.date,
+      {required this.id,
+      required this.date,
       required this.fuel,
       required this.fullTank,
       required this.litres,
@@ -18,6 +20,7 @@ class RefuelDto {
 
   factory RefuelDto.fromJson(Map<String, dynamic> json) {
     return RefuelDto(
+        id: json['id'] as int,
         date: DateTime.parse(json['date']),
         fuel: json['fuel'] as String,
         fullTank: json['fullTank'] as bool,

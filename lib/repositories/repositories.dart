@@ -61,12 +61,12 @@ class UserRepository {
 }
 
 class RefuelRepository {
-  var refuelByCarName = '$mainUrl/refuel/';
+  var refuelUri = '$mainUrl/refuel';
 
   Future<List<RefuelDto>> getRefuelByCarName(String carName) async {
     var token = await storage.read(key: 'token');
 
-    final response = await http.get(Uri.parse(refuelByCarName + carName),
+    final response = await http.get(Uri.parse('$refuelUri/$carName'),
         headers: {HttpHeaders.authorizationHeader: "$token"});
 
     if (response.statusCode == 200) {
@@ -76,6 +76,39 @@ class RefuelRepository {
       return List.empty();
     } else {
       throw Exception("Error occured");
+    }
+  }
+
+  Future<http.Response> addRefuel(
+      DateTime date,
+      String carName,
+      String fuel,
+      bool fullTank,
+      int litres,
+      int odometer,
+      double price,
+      double totalCost) async {
+    var token = await storage.read(key: 'token');
+
+    final response = await http.post(Uri.parse('$refuelUri/$carName'),
+        body: jsonEncode({
+          "date": date,
+          "fuel": fuel,
+          "fullTank": fullTank,
+          "litres": litres,
+          "odometer": odometer,
+          "price": price,
+          "totalCost": totalCost
+        }),
+        headers: {
+          HttpHeaders.authorizationHeader: "$token",
+          "content-type": "application/json"
+        });
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      throw Exception("Error.");
     }
   }
 }
