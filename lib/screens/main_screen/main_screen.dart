@@ -5,6 +5,7 @@ import 'package:flutter_tracker_client/bloc/auth_bloc/auth.dart';
 import 'package:flutter_tracker_client/dto/refuel_dto.dart';
 import 'package:flutter_tracker_client/dto/vehicle_dto.dart';
 import 'package:flutter_tracker_client/repositories/repositories.dart';
+import 'package:flutter_tracker_client/screens/vahicle_screen/vehicle_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_tracker_client/style/theme.dart' as style;
 
@@ -20,8 +21,6 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   var vehicleRepository = VehicleRepository();
   late String vehicleValue = "";
-
-  addVehicle() {}
 
   @override
   Widget build(BuildContext context) {
@@ -71,18 +70,27 @@ class _MainScreenState extends State<MainScreen> {
                                   style: const TextStyle(color: Colors.black)),
                             );
                           }).toList()),
-                      const SizedBox(width: 20),
+                      const SizedBox(width: 30),
                       const Text("Fuel tracker"),
                     ],
                   ),
                   actions: [
+                    IconButton(
+                      icon: const Icon(EvaIcons.fileAdd),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const VehicleScreen()));
+                      },
+                    ),
                     IconButton(
                         icon: const Icon(EvaIcons.logOutOutline),
                         onPressed: () {
                           BlocProvider.of<AuthenticationBloc>(context).add(
                             LoggedOut(),
                           );
-                        })
+                        }),
                   ],
                 ),
                 body: Center(
@@ -135,6 +143,12 @@ class _MainScreenState extends State<MainScreen> {
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 14.0),
                                               ),
+                                              Text(
+                                                vehicleValue,
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 14.0),
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -160,7 +174,7 @@ class _MainScreenState extends State<MainScreen> {
                                                     data[index]
                                                         .litres
                                                         .toString() +
-                                                    ")l",
+                                                    "l)",
                                                 style: const TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 14.0),
@@ -193,7 +207,14 @@ class _MainScreenState extends State<MainScreen> {
 
                     return const CircularProgressIndicator();
                   },
-                )));
+                )),
+                floatingActionButton: FloatingActionButton.extended(
+                    onPressed: () {}, //Add Navigator
+                    icon: const Icon(Icons.add),
+                    label: const Text('Add'),
+                    backgroundColor: style.Colors.mainColor),
+                floatingActionButtonLocation:
+                    FloatingActionButtonLocation.centerFloat);
           } else {
             return Scaffold(
                 appBar: AppBar(
@@ -202,7 +223,13 @@ class _MainScreenState extends State<MainScreen> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       IconButton(
-                          onPressed: addVehicle(),
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const VehicleScreen()));
+                          },
                           icon: const Icon(EvaIcons.fileAdd)),
                       const SizedBox(width: 55),
                       const Text("Fuel tracker"),

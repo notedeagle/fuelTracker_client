@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
       home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
         builder: (context, state) {
           if (state is AuthenticationAuthenticated) {
-            return MainScreen();
+            return const MainScreen();
           }
           if (state is AuthenticationUnauthenticated) {
             return IntroPage(userRepository: userRepository);
