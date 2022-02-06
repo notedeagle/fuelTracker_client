@@ -81,12 +81,12 @@ class RefuelRepository {
 }
 
 class VehicleRepository {
-  var customerVehicles = '$mainUrl/vehicle/user';
+  var customerVehicles = '$mainUrl/vehicle';
 
   Future<List<VehicleDto>> getCustomerVehicles() async {
     var token = await storage.read(key: 'token');
 
-    final response = await http.get(Uri.parse(customerVehicles),
+    final response = await http.get(Uri.parse('$customerVehicles/user'),
         headers: {HttpHeaders.authorizationHeader: "$token"});
 
     if (response.statusCode == 200) {
@@ -97,5 +97,48 @@ class VehicleRepository {
     } else {
       throw Exception("Error.");
     }
+  }
+
+  Future<http.Response> addVehicle(
+      String brand,
+      int mileage,
+      String model,
+      String name,
+      String plateNumber,
+      String registrationYear,
+      String vehicleType,
+      String yearOfProduction) async {
+    var token = await storage.read(key: 'token');
+
+    final response = await http.post(Uri.parse(customerVehicles),
+        body: jsonEncode({
+          "brand": brand,
+          "mileage": mileage,
+          "model": model,
+          "name": name,
+          "plateNumber": plateNumber,
+          "registrationYear": 2004,
+          "vehicleType": "PETROL",
+          "yearOfProduction": 2004
+        }),
+        headers: {
+          HttpHeaders.authorizationHeader: "$token",
+          "content-type": "application/json"
+        });
+
+    if (response.statusCode == 200) {
+      return response;
+    } else if (response.statusCode == 409) {
+      throw Exception("Vehicle name taken.");
+    } else {
+      throw Exception("Error.");
+    }
+  }
+
+  void removeVehicle(String name) async {
+    var token = await storage.read(key: 'token');
+
+    await http.delete(Uri.parse('$customerVehicles/$name'),
+        headers: {HttpHeaders.authorizationHeader: "$token"});
   }
 }

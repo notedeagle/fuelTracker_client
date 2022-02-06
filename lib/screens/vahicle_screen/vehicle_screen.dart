@@ -1,10 +1,8 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_tracker_client/bloc/auth_bloc/auth_bloc.dart';
-import 'package:flutter_tracker_client/bloc/auth_bloc/auth_event.dart';
 import 'package:flutter_tracker_client/dto/vehicle_dto.dart';
 import 'package:flutter_tracker_client/repositories/repositories.dart';
+import 'package:flutter_tracker_client/screens/vahicle_screen/add_vehicle_screen.dart';
 import 'package:flutter_tracker_client/style/theme.dart' as style;
 
 class VehicleScreen extends StatefulWidget {
@@ -95,7 +93,7 @@ class _VehicleScreenState extends State<VehicleScreen> {
                                         ),
                                       ),
                                       Container(
-                                        height: 100,
+                                        height: 115,
                                         width: 190,
                                         padding: const EdgeInsets.only(
                                             top: 15, left: 60),
@@ -121,6 +119,14 @@ class _VehicleScreenState extends State<VehicleScreen> {
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 14.0),
+                                            ),
+                                            IconButton(
+                                              icon: const Icon(EvaIcons.trash),
+                                              onPressed: () {
+                                                vehicleRepository.removeVehicle(
+                                                    data[index].name);
+                                                setState(() {});
+                                              },
                                             )
                                           ],
                                         ),
@@ -136,7 +142,13 @@ class _VehicleScreenState extends State<VehicleScreen> {
                 },
               )),
               floatingActionButton: FloatingActionButton.extended(
-                  onPressed: () {}, //Add Navigator
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AddVehicleScreen(
+                                vehicleRepository: vehicleRepository)));
+                  },
                   icon: const Icon(Icons.add),
                   label: const Text('Add'),
                   backgroundColor: style.Colors.mainColor),

@@ -81,7 +81,7 @@ class _MainScreenState extends State<MainScreen> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (conext) => const VehicleScreen()));
+                                builder: (context) => const VehicleScreen()));
                       },
                     ),
                     IconButton(
@@ -174,7 +174,7 @@ class _MainScreenState extends State<MainScreen> {
                                                     data[index]
                                                         .litres
                                                         .toString() +
-                                                    ")l",
+                                                    "l)",
                                                 style: const TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 14.0),
