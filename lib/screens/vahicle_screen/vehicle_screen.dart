@@ -26,8 +26,8 @@ class _VehicleScreenState extends State<VehicleScreen> {
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: const [
-                      SizedBox(width: 62),
-                      Text("Fuel tracker"),
+                      SizedBox(width: 80),
+                      Text("Vehicles"),
                     ],
                   )),
               body: Center(
@@ -125,6 +125,12 @@ class _VehicleScreenState extends State<VehicleScreen> {
                                               onPressed: () {
                                                 vehicleRepository.removeVehicle(
                                                     data[index].name);
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(const SnackBar(
+                                                        content: Text(
+                                                            "Vehicle deleted."),
+                                                        backgroundColor:
+                                                            Colors.green));
                                                 setState(() {});
                                               },
                                             )
@@ -144,10 +150,11 @@ class _VehicleScreenState extends State<VehicleScreen> {
               floatingActionButton: FloatingActionButton.extended(
                   onPressed: () {
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AddVehicleScreen(
-                                vehicleRepository: vehicleRepository)));
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AddVehicleScreen(
+                                    vehicleRepository: vehicleRepository)))
+                        .then((_) => setState(() {}));
                   },
                   icon: const Icon(Icons.add),
                   label: const Text('Add'),

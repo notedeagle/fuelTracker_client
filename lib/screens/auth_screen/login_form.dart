@@ -235,12 +235,13 @@ class _LoginFormState extends State<LoginForm> {
                               GestureDetector(
                                   onTap: () {
                                     Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                RegisterScreen(
-                                                    userRepository:
-                                                        userRepository)));
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    RegisterScreen(
+                                                        userRepository:
+                                                            userRepository)))
+                                        .then((_) => setState(() {}));
                                   },
                                   child: const Text(
                                     "Register",

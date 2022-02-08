@@ -2,10 +2,12 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_tracker_client/bloc/refuel_bloc/refuel_bloc.dart';
 import 'package:flutter_tracker_client/repositories/repositories.dart';
 import 'package:flutter_tracker_client/screens/main_screen/main_screen.dart';
 import 'package:flutter_tracker_client/style/theme.dart' as style;
+import 'package:intl/intl.dart';
 
 class RefuelForm extends StatefulWidget {
   final RefuelRepository refuelRepository;
@@ -28,23 +30,39 @@ class _RefuelFormState extends State<RefuelForm> {
   _RefuelFormState(this.refuelRepository, this.carName);
 
   final _dateController = TextEditingController();
-  final _fuelController = TextEditingController();
-  final bool fullTank = false; //?
+  bool fullTank = false;
   final _litresController = TextEditingController();
   final _odometerController = TextEditingController();
   final _priceController = TextEditingController();
   final _totalCostController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+  DateTime selectedDate = DateTime.now();
+
+  var _selectedValue;
+  final _categories = ["DIESEL", "GASOLINE", "ELECTRIC", "LPG"];
+
+  Future _selectDate() async {
+    DatePicker.showDateTimePicker(context,
+        showTitleActions: true,
+        minTime: DateTime(2020, 1, 1, 0, 0, 0),
+        maxTime: DateTime(2024, 12, 12, 0, 0, 0), onChanged: (date) {
+      setState(() {
+        selectedDate = date;
+      });
+      _dateController.text =
+          DateFormat('yyyy-MM-ddTHH:mm:ss').format(selectedDate);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     _onAddButtonPressed() {
       if (_formKey.currentState!.validate()) {
         BlocProvider.of<RefuelBloc>(context).add(AddButtonPressed(
-            date: DateTime.parse(_dateController.text),
+            date: selectedDate,
             carName: carName,
-            fuel: _fuelController.text,
+            fuel: _selectedValue,
             fullTank: fullTank,
             litres: int.parse(_litresController.text),
             odometer: int.parse(_odometerController.text),
@@ -61,9 +79,9 @@ class _RefuelFormState extends State<RefuelForm> {
         }
         if (state is RefuelInitial) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text("Vehicle added."), backgroundColor: Colors.green));
+              content: Text("Refuel added."), backgroundColor: Colors.green));
 
-          Navigator.push(context,
+          Navigator.pop(context,
               MaterialPageRoute(builder: (context) => const MainScreen()));
         }
       },
@@ -82,7 +100,7 @@ class _RefuelFormState extends State<RefuelForm> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
                         Text(
-                          "ADD NEW VEHICLE",
+                          "ADD NEW REFUEL",
                           style: TextStyle(
                               color: style.Colors.mainColor,
                               fontWeight: FontWeight.bold,
@@ -101,6 +119,10 @@ class _RefuelFormState extends State<RefuelForm> {
                         fontWeight: FontWeight.bold),
                     controller: _dateController,
                     keyboardType: TextInputType.datetime,
+                    onTap: () {
+                      _selectDate();
+                      FocusScope.of(context).requestFocus(FocusNode());
+                    },
                     decoration: InputDecoration(
                       prefixIcon: const Icon(EvaIcons.carOutline,
                           color: Colors.black26),
@@ -133,119 +155,49 @@ class _RefuelFormState extends State<RefuelForm> {
                   const SizedBox(
                     height: 20.0,
                   ),
-                  TextFormField(
-                    style: const TextStyle(
-                        fontSize: 14.0,
-                        color: style.Colors.titleColor,
-                        fontWeight: FontWeight.bold),
-                    controller: _fuelController,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(
-                      fillColor: Colors.white,
-                      prefixIcon: const Icon(
-                        EvaIcons.carOutline,
-                        color: Colors.black26,
+                  DropdownButtonFormField(
+                      decoration: InputDecoration(
+                        fillColor: Colors.white,
+                        prefixIcon: const Icon(
+                          EvaIcons.carOutline,
+                          color: Colors.black26,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(color: Colors.black12),
+                            borderRadius: BorderRadius.circular(30.0)),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: style.Colors.mainColor),
+                            borderRadius: BorderRadius.circular(30.0)),
+                        contentPadding:
+                            const EdgeInsets.only(left: 10.0, right: 10.0),
+                        labelText: "Fuel type",
+                        hintStyle: const TextStyle(
+                            fontSize: 12.0,
+                            color: style.Colors.grey,
+                            fontWeight: FontWeight.w500),
+                        labelStyle: const TextStyle(
+                            fontSize: 12.0,
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w500),
                       ),
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Colors.black12),
-                          borderRadius: BorderRadius.circular(30.0)),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(color: style.Colors.mainColor),
-                          borderRadius: BorderRadius.circular(30.0)),
-                      contentPadding:
-                          const EdgeInsets.only(left: 10.0, right: 10.0),
-                      labelText: "Fuel",
-                      hintStyle: const TextStyle(
-                          fontSize: 12.0,
-                          color: style.Colors.grey,
-                          fontWeight: FontWeight.w500),
-                      labelStyle: const TextStyle(
-                          fontSize: 12.0,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    validator: (value) =>
-                        value!.isEmpty ? "Fuel cannot be blank." : null,
-                    autocorrect: false,
-                  ),
-                  const SizedBox(
-                    height: 20.0,
-                  ),
-                  TextFormField(
-                    style: const TextStyle(
-                        fontSize: 14.0,
-                        color: style.Colors.titleColor,
-                        fontWeight: FontWeight.bold),
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(
-                      fillColor: Colors.white,
-                      prefixIcon: const Icon(
-                        EvaIcons.carOutline,
-                        color: Colors.black26,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Colors.black12),
-                          borderRadius: BorderRadius.circular(30.0)),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(color: style.Colors.mainColor),
-                          borderRadius: BorderRadius.circular(30.0)),
-                      contentPadding:
-                          const EdgeInsets.only(left: 10.0, right: 10.0),
-                      labelText: "Full tank", //jeden wybór
-                      hintStyle: const TextStyle(
-                          fontSize: 12.0,
-                          color: style.Colors.grey,
-                          fontWeight: FontWeight.w500),
-                      labelStyle: const TextStyle(
-                          fontSize: 12.0,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    validator: (value) =>
-                        value!.isEmpty ? "Full tank cannot be blank." : null,
-                    autocorrect: false,
-                  ),
-                  const SizedBox(
-                    height: 20.0,
-                  ),
-                  TextFormField(
-                    style: const TextStyle(
-                        fontSize: 14.0,
-                        color: style.Colors.titleColor,
-                        fontWeight: FontWeight.bold),
-                    controller: _litresController,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(
-                      fillColor: Colors.white,
-                      prefixIcon: const Icon(
-                        EvaIcons.carOutline,
-                        color: Colors.black26,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Colors.black12),
-                          borderRadius: BorderRadius.circular(30.0)),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(color: style.Colors.mainColor),
-                          borderRadius: BorderRadius.circular(30.0)),
-                      contentPadding:
-                          const EdgeInsets.only(left: 10.0, right: 10.0),
-                      labelText: "Litres",
-                      hintStyle: const TextStyle(
-                          fontSize: 12.0,
-                          color: style.Colors.grey,
-                          fontWeight: FontWeight.w500),
-                      labelStyle: const TextStyle(
-                          fontSize: 12.0,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    validator: (value) =>
-                        value!.isEmpty ? "Litres name cannot be blank." : null,
-                    autocorrect: false,
-                  ),
+                      items: _categories.map((String dropDownStringItem) {
+                        return DropdownMenuItem<String>(
+                            value: dropDownStringItem,
+                            child: Text(dropDownStringItem));
+                      }).toList(),
+                      value: _selectedValue,
+                      hint: const Text("Fuel type"),
+                      validator: (value) {
+                        if (value == null) {
+                          return "Fuel type cannot be blank.";
+                        }
+                      },
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedValue = value;
+                        });
+                      }),
                   const SizedBox(
                     height: 20.0,
                   ),
@@ -287,6 +239,45 @@ class _RefuelFormState extends State<RefuelForm> {
                         }
                       },
                       autocorrect: false),
+                  const SizedBox(
+                    height: 20.0,
+                  ),
+                  TextFormField(
+                    style: const TextStyle(
+                        fontSize: 14.0,
+                        color: style.Colors.titleColor,
+                        fontWeight: FontWeight.bold),
+                    controller: _litresController,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(
+                      fillColor: Colors.white,
+                      prefixIcon: const Icon(
+                        EvaIcons.carOutline,
+                        color: Colors.black26,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: Colors.black12),
+                          borderRadius: BorderRadius.circular(30.0)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              const BorderSide(color: style.Colors.mainColor),
+                          borderRadius: BorderRadius.circular(30.0)),
+                      contentPadding:
+                          const EdgeInsets.only(left: 10.0, right: 10.0),
+                      labelText: "Litres",
+                      hintStyle: const TextStyle(
+                          fontSize: 12.0,
+                          color: style.Colors.grey,
+                          fontWeight: FontWeight.w500),
+                      labelStyle: const TextStyle(
+                          fontSize: 12.0,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500),
+                    ),
+                    validator: (value) =>
+                        value!.isEmpty ? "Litres name cannot be blank." : null,
+                    autocorrect: false,
+                  ),
                   const SizedBox(
                     height: 20.0,
                   ),
@@ -367,6 +358,27 @@ class _RefuelFormState extends State<RefuelForm> {
                         }
                       },
                       autocorrect: false),
+                  const SizedBox(
+                    height: 20.0,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(color: style.Colors.grey),
+                        borderRadius: BorderRadius.circular(30.0)),
+                    child: CheckboxListTile(
+                        title: const Text(
+                          "Full tank",
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        value: fullTank,
+                        activeColor: style.Colors.mainColor,
+                        onChanged: (newValue) => setState(() {
+                              fullTank = newValue!;
+                            })),
+                  ),
                   const SizedBox(
                     height: 30.0,
                   ),

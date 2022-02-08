@@ -22,7 +22,13 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   var vehicleRepository = VehicleRepository();
   var refuelRepository = RefuelRepository();
-  late String vehicleValue = "";
+  String vehicleValue = "";
+
+  String afc(double litres, int odometer, int prevOdometer) {
+    double afc = litres / (odometer - prevOdometer) * 100;
+
+    return afc.toStringAsFixed(2) + "l/100km";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +52,7 @@ class _MainScreenState extends State<MainScreen> {
                           selectedItemBuilder: (_) {
                             return cars
                                 .map((e) => Container(
+                                      width: 70,
                                       alignment: Alignment.center,
                                       child: Text(
                                         e.name,
@@ -72,8 +79,8 @@ class _MainScreenState extends State<MainScreen> {
                                   style: const TextStyle(color: Colors.black)),
                             );
                           }).toList()),
-                      const SizedBox(width: 30),
-                      const Text("Fuel tracker"),
+                      const SizedBox(width: 25),
+                      const Center(child: Text("Fuel tracker"))
                     ],
                   ),
                   actions: [
@@ -81,9 +88,11 @@ class _MainScreenState extends State<MainScreen> {
                       icon: const Icon(EvaIcons.fileAdd),
                       onPressed: () {
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const VehicleScreen()));
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const VehicleScreen()))
+                            .then((_) => setState(() {}));
                       },
                     ),
                     IconButton(
@@ -129,8 +138,8 @@ class _MainScreenState extends State<MainScreen> {
                                     child: Row(
                                       children: [
                                         Container(
-                                          height: 100,
-                                          width: 200,
+                                          height: 115,
+                                          width: 150,
                                           padding: const EdgeInsets.only(
                                               top: 15, left: 15, right: 15),
                                           child: Column(
@@ -151,12 +160,27 @@ class _MainScreenState extends State<MainScreen> {
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 14.0),
                                               ),
+                                              IconButton(
+                                                icon:
+                                                    const Icon(EvaIcons.trash),
+                                                onPressed: () {
+                                                  refuelRepository.removeRefuel(
+                                                      data[index].id);
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(const SnackBar(
+                                                          content: Text(
+                                                              "Refuel deleted."),
+                                                          backgroundColor:
+                                                              Colors.green));
+                                                  setState(() {});
+                                                },
+                                              )
                                             ],
                                           ),
                                         ),
                                         Container(
                                           height: 100,
-                                          width: 190,
+                                          width: 240,
                                           padding: const EdgeInsets.only(
                                               top: 15, left: 60),
                                           child: Column(
@@ -196,7 +220,20 @@ class _MainScreenState extends State<MainScreen> {
                                                 style: const TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 14.0),
-                                              )
+                                              ),
+                                              if (data.length > 1 &&
+                                                  index != 0) ...[
+                                                Text(
+                                                  afc(
+                                                      data[index].litres,
+                                                      data[index].odometer,
+                                                      data[index - 1].odometer),
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 14.0),
+                                                )
+                                              ]
                                             ],
                                           ),
                                         )
@@ -218,7 +255,7 @@ class _MainScreenState extends State<MainScreen> {
                               builder: (context) => AddRefuelScreen(
                                     refuelRepository: refuelRepository,
                                     carName: vehicleValue,
-                                  )));
+                                  ))).then((_) => setState(() {}));
                     },
                     icon: const Icon(Icons.add),
                     label: const Text('Add'),
@@ -235,10 +272,11 @@ class _MainScreenState extends State<MainScreen> {
                       IconButton(
                           onPressed: () {
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const VehicleScreen()));
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const VehicleScreen()))
+                                .then((_) => setState(() {}));
                           },
                           icon: const Icon(EvaIcons.fileAdd)),
                       const SizedBox(width: 55),

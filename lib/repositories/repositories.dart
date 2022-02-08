@@ -6,6 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_tracker_client/dto/refuel_dto.dart';
 import 'package:flutter_tracker_client/dto/vehicle_dto.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 String mainUrl = "http://localhost:8081";
 final Dio _dio = Dio();
@@ -92,7 +93,7 @@ class RefuelRepository {
 
     final response = await http.post(Uri.parse('$refuelUri/$carName'),
         body: jsonEncode({
-          "date": date,
+          "date": DateFormat('yyyy-MM-ddTHH:mm:ss').format(date),
           "fuel": fuel,
           "fullTank": fullTank,
           "litres": litres,
@@ -110,6 +111,13 @@ class RefuelRepository {
     } else {
       throw Exception("Error.");
     }
+  }
+
+  void removeRefuel(int id) async {
+    var token = await storage.read(key: 'token');
+
+    await http.delete(Uri.parse('$refuelUri/$id'),
+        headers: {HttpHeaders.authorizationHeader: "$token"});
   }
 }
 
