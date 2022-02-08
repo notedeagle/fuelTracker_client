@@ -35,6 +35,7 @@ class _RefuelFormState extends State<RefuelForm> {
   final _odometerController = TextEditingController();
   final _priceController = TextEditingController();
   final _totalCostController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   final _formKey = GlobalKey<FormState>();
   DateTime selectedDate = DateTime.now();
@@ -51,8 +52,31 @@ class _RefuelFormState extends State<RefuelForm> {
         selectedDate = date;
       });
       _dateController.text =
-          DateFormat('yyyy-MM-ddTHH:mm:ss').format(selectedDate);
+          DateFormat.yMMMEd('en_US').add_Hm().format(selectedDate);
     });
+  }
+
+  String totalCost() {
+    double total =
+        int.parse(_litresController.text) * double.parse(_priceController.text);
+
+    return total.toStringAsFixed(2);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus) {
+        _totalCostController.text = totalCost();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -327,6 +351,7 @@ class _RefuelFormState extends State<RefuelForm> {
                           color: style.Colors.titleColor,
                           fontWeight: FontWeight.bold),
                       controller: _totalCostController,
+                      focusNode: _focusNode,
                       decoration: InputDecoration(
                         fillColor: Colors.white,
                         prefixIcon: const Icon(

@@ -42,68 +42,83 @@ class _MainScreenState extends State<MainScreen> {
               vehicleValue = cars[0].name;
             }
             return Scaffold(
-                appBar: AppBar(
-                  backgroundColor: style.Colors.mainColor,
-                  title: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                endDrawer: Drawer(
+                  child: ListView(
+                    padding: EdgeInsets.zero,
                     children: [
-                      DropdownButton<String>(
-                          value: vehicleValue,
-                          selectedItemBuilder: (_) {
-                            return cars
-                                .map((e) => Container(
-                                      width: 70,
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        e.name,
-                                        style: const TextStyle(
-                                            color: Colors.white),
-                                      ),
-                                    ))
-                                .toList();
-                          },
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14),
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              vehicleValue = newValue!;
-                            });
-                          },
-                          items: cars.map<DropdownMenuItem<String>>(
-                              (VehicleDto value) {
-                            return DropdownMenuItem<String>(
-                              value: value.name,
-                              child: Text(value.name,
-                                  style: const TextStyle(color: Colors.black)),
-                            );
-                          }).toList()),
-                      const SizedBox(width: 25),
-                      const Center(child: Text("Fuel tracker"))
-                    ],
-                  ),
-                  actions: [
-                    IconButton(
-                      icon: const Icon(EvaIcons.fileAdd),
-                      onPressed: () {
-                        Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const VehicleScreen()))
-                            .then((_) => setState(() {}));
-                      },
-                    ),
-                    IconButton(
-                        icon: const Icon(EvaIcons.logOutOutline),
-                        onPressed: () {
+                      const SizedBox(
+                        height: 100,
+                      ),
+                      ListTile(
+                          leading: const Icon(EvaIcons.fileAdd),
+                          title: const Text("Add vehicle"),
+                          onTap: () {
+                            Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const VehicleScreen()))
+                                .then((_) => setState(() {}));
+                          }),
+                      ListTile(
+                        leading: const Icon(Icons.input),
+                        title: const Text("Raports"),
+                        onTap: () => {}, //add route to raports
+                      ),
+                      ListTile(
+                        leading: const Icon(EvaIcons.logOutOutline),
+                        title: const Text("Log out"),
+                        onTap: () {
                           BlocProvider.of<AuthenticationBloc>(context).add(
                             LoggedOut(),
                           );
-                        }),
-                  ],
+                        },
+                      )
+                    ],
+                  ),
                 ),
+                appBar: AppBar(
+                    backgroundColor: style.Colors.mainColor,
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        DropdownButton<String>(
+                            value: vehicleValue,
+                            selectedItemBuilder: (_) {
+                              return cars
+                                  .map((e) => Container(
+                                        width: 50,
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          e.name,
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        ),
+                                      ))
+                                  .toList();
+                            },
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                vehicleValue = newValue!;
+                              });
+                            },
+                            items: cars.map<DropdownMenuItem<String>>(
+                                (VehicleDto value) {
+                              return DropdownMenuItem<String>(
+                                value: value.name,
+                                child: Text(value.name,
+                                    style:
+                                        const TextStyle(color: Colors.black)),
+                              );
+                            }).toList()),
+                        const SizedBox(width: 30),
+                        const Center(child: Text("Fuel tracker"))
+                      ],
+                    )),
                 body: Center(
                     child: FutureBuilder<List<RefuelDto>>(
                   future: RefuelRepository().getRefuelByCarName(vehicleValue),

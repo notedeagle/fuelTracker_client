@@ -1,7 +1,10 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_tracker_client/bloc/auth_bloc/auth.dart';
 import 'package:flutter_tracker_client/dto/vehicle_dto.dart';
 import 'package:flutter_tracker_client/repositories/repositories.dart';
+import 'package:flutter_tracker_client/screens/main_screen/main_screen.dart';
 import 'package:flutter_tracker_client/screens/vahicle_screen/add_vehicle_screen.dart';
 import 'package:flutter_tracker_client/style/theme.dart' as style;
 
@@ -21,8 +24,41 @@ class _VehicleScreenState extends State<VehicleScreen> {
         future: vehicleRepository.getCustomerVehicles(),
         builder: (context, snapshot) {
           return Scaffold(
+              endDrawer: Drawer(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: [
+                    const SizedBox(
+                      height: 100,
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.input),
+                      title: const Text("Raports"),
+                      onTap: () => {},
+                    ),
+                    ListTile(
+                      leading: const Icon(EvaIcons.logOutOutline),
+                      title: const Text("Log out"),
+                      onTap: () {
+                        BlocProvider.of<AuthenticationBloc>(context).add(
+                          LoggedOut(),
+                        );
+                      },
+                    )
+                  ],
+                ),
+              ),
               appBar: AppBar(
                   backgroundColor: style.Colors.mainColor,
+                  leading: InkWell(
+                    child: const Icon(
+                      Icons.arrow_back_ios_new,
+                      color: Colors.white,
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                  ),
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: const [
