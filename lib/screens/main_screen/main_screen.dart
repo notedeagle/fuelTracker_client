@@ -5,6 +5,7 @@ import 'package:flutter_tracker_client/bloc/auth_bloc/auth.dart';
 import 'package:flutter_tracker_client/dto/refuel_dto.dart';
 import 'package:flutter_tracker_client/dto/vehicle_dto.dart';
 import 'package:flutter_tracker_client/repositories/repositories.dart';
+import 'package:flutter_tracker_client/screens/refuel_screen/add_refuel_screen.dart';
 import 'package:flutter_tracker_client/screens/vahicle_screen/vehicle_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_tracker_client/style/theme.dart' as style;
@@ -20,6 +21,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   var vehicleRepository = VehicleRepository();
+  var refuelRepository = RefuelRepository();
   late String vehicleValue = "";
 
   @override
@@ -209,7 +211,15 @@ class _MainScreenState extends State<MainScreen> {
                   },
                 )),
                 floatingActionButton: FloatingActionButton.extended(
-                    onPressed: () {}, //Add Navigator
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AddRefuelScreen(
+                                    refuelRepository: refuelRepository,
+                                    carName: vehicleValue,
+                                  )));
+                    },
                     icon: const Icon(Icons.add),
                     label: const Text('Add'),
                     backgroundColor: style.Colors.mainColor),

@@ -1,4 +1,5 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tracker_client/bloc/refuel_bloc/refuel_bloc.dart';
@@ -8,18 +9,23 @@ import 'package:flutter_tracker_client/style/theme.dart' as style;
 
 class RefuelForm extends StatefulWidget {
   final RefuelRepository refuelRepository;
+  final String carName;
 
-  const RefuelForm({Key? key, required this.refuelRepository})
+  const RefuelForm(
+      {Key? key, required this.refuelRepository, required this.carName})
       : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _RefuelFormState(refuelRepository);
+  // ignore: no_logic_in_create_state
+  State<StatefulWidget> createState() =>
+      _RefuelFormState(refuelRepository, carName);
 }
 
 class _RefuelFormState extends State<RefuelForm> {
   final RefuelRepository refuelRepository;
+  final String carName;
 
-  _RefuelFormState(this.refuelRepository);
+  _RefuelFormState(this.refuelRepository, this.carName);
 
   final _dateController = TextEditingController();
   final _fuelController = TextEditingController();
@@ -33,7 +39,7 @@ class _RefuelFormState extends State<RefuelForm> {
 
   @override
   Widget build(BuildContext context) {
-    _onAddButtonPressed(String carName) {
+    _onAddButtonPressed() {
       if (_formKey.currentState!.validate()) {
         BlocProvider.of<RefuelBloc>(context).add(AddButtonPressed(
             date: DateTime.parse(_dateController.text),
@@ -132,7 +138,7 @@ class _RefuelFormState extends State<RefuelForm> {
                         fontSize: 14.0,
                         color: style.Colors.titleColor,
                         fontWeight: FontWeight.bold),
-                    controller: _mileageController,
+                    controller: _fuelController,
                     keyboardType: TextInputType.text,
                     decoration: InputDecoration(
                       fillColor: Colors.white,
@@ -149,7 +155,7 @@ class _RefuelFormState extends State<RefuelForm> {
                           borderRadius: BorderRadius.circular(30.0)),
                       contentPadding:
                           const EdgeInsets.only(left: 10.0, right: 10.0),
-                      labelText: "Mileage",
+                      labelText: "Fuel",
                       hintStyle: const TextStyle(
                           fontSize: 12.0,
                           color: style.Colors.grey,
@@ -160,7 +166,7 @@ class _RefuelFormState extends State<RefuelForm> {
                           fontWeight: FontWeight.w500),
                     ),
                     validator: (value) =>
-                        value!.isEmpty ? "Mileage cannot be blank." : null,
+                        value!.isEmpty ? "Fuel cannot be blank." : null,
                     autocorrect: false,
                   ),
                   const SizedBox(
@@ -171,7 +177,6 @@ class _RefuelFormState extends State<RefuelForm> {
                         fontSize: 14.0,
                         color: style.Colors.titleColor,
                         fontWeight: FontWeight.bold),
-                    controller: _modelController,
                     keyboardType: TextInputType.text,
                     decoration: InputDecoration(
                       fillColor: Colors.white,
@@ -188,7 +193,7 @@ class _RefuelFormState extends State<RefuelForm> {
                           borderRadius: BorderRadius.circular(30.0)),
                       contentPadding:
                           const EdgeInsets.only(left: 10.0, right: 10.0),
-                      labelText: "Model",
+                      labelText: "Full tank", //jeden wybór
                       hintStyle: const TextStyle(
                           fontSize: 12.0,
                           color: style.Colors.grey,
@@ -199,7 +204,7 @@ class _RefuelFormState extends State<RefuelForm> {
                           fontWeight: FontWeight.w500),
                     ),
                     validator: (value) =>
-                        value!.isEmpty ? "Model cannot be blank." : null,
+                        value!.isEmpty ? "Full tank cannot be blank." : null,
                     autocorrect: false,
                   ),
                   const SizedBox(
@@ -210,7 +215,7 @@ class _RefuelFormState extends State<RefuelForm> {
                         fontSize: 14.0,
                         color: style.Colors.titleColor,
                         fontWeight: FontWeight.bold),
-                    controller: _nameController,
+                    controller: _litresController,
                     keyboardType: TextInputType.text,
                     decoration: InputDecoration(
                       fillColor: Colors.white,
@@ -227,7 +232,7 @@ class _RefuelFormState extends State<RefuelForm> {
                           borderRadius: BorderRadius.circular(30.0)),
                       contentPadding:
                           const EdgeInsets.only(left: 10.0, right: 10.0),
-                      labelText: "Vehicle name",
+                      labelText: "Litres",
                       hintStyle: const TextStyle(
                           fontSize: 12.0,
                           color: style.Colors.grey,
@@ -238,7 +243,7 @@ class _RefuelFormState extends State<RefuelForm> {
                           fontWeight: FontWeight.w500),
                     ),
                     validator: (value) =>
-                        value!.isEmpty ? "Vehicle name cannot be blank." : null,
+                        value!.isEmpty ? "Litres name cannot be blank." : null,
                     autocorrect: false,
                   ),
                   const SizedBox(
@@ -249,7 +254,7 @@ class _RefuelFormState extends State<RefuelForm> {
                           fontSize: 14.0,
                           color: style.Colors.titleColor,
                           fontWeight: FontWeight.bold),
-                      controller: _productionYear,
+                      controller: _odometerController,
                       keyboardType: const TextInputType.numberWithOptions(),
                       decoration: InputDecoration(
                         fillColor: Colors.white,
@@ -266,7 +271,7 @@ class _RefuelFormState extends State<RefuelForm> {
                             borderRadius: BorderRadius.circular(30.0)),
                         contentPadding:
                             const EdgeInsets.only(left: 10.0, right: 10.0),
-                        labelText: "Production year",
+                        labelText: "Odometer",
                         hintStyle: const TextStyle(
                             fontSize: 12.0,
                             color: style.Colors.grey,
@@ -278,7 +283,7 @@ class _RefuelFormState extends State<RefuelForm> {
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
-                          return "Production year cannot be blank.";
+                          return "Odometer cannot be blank.";
                         }
                       },
                       autocorrect: false),
@@ -290,7 +295,7 @@ class _RefuelFormState extends State<RefuelForm> {
                           fontSize: 14.0,
                           color: style.Colors.titleColor,
                           fontWeight: FontWeight.bold),
-                      controller: _plateNumberController,
+                      controller: _priceController,
                       decoration: InputDecoration(
                         fillColor: Colors.white,
                         prefixIcon: const Icon(
@@ -306,7 +311,7 @@ class _RefuelFormState extends State<RefuelForm> {
                             borderRadius: BorderRadius.circular(30.0)),
                         contentPadding:
                             const EdgeInsets.only(left: 10.0, right: 10.0),
-                        labelText: "Plate number",
+                        labelText: "Price",
                         hintStyle: const TextStyle(
                             fontSize: 12.0,
                             color: style.Colors.grey,
@@ -318,7 +323,47 @@ class _RefuelFormState extends State<RefuelForm> {
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
-                          return "Plate number cannot be blank.";
+                          return "Price cannot be blank.";
+                        }
+                      },
+                      autocorrect: false),
+                  const SizedBox(
+                    height: 20.0,
+                  ),
+                  TextFormField(
+                      style: const TextStyle(
+                          fontSize: 14.0,
+                          color: style.Colors.titleColor,
+                          fontWeight: FontWeight.bold),
+                      controller: _totalCostController,
+                      decoration: InputDecoration(
+                        fillColor: Colors.white,
+                        prefixIcon: const Icon(
+                          EvaIcons.carOutline,
+                          color: Colors.black26,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(color: Colors.black12),
+                            borderRadius: BorderRadius.circular(30.0)),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: style.Colors.mainColor),
+                            borderRadius: BorderRadius.circular(30.0)),
+                        contentPadding:
+                            const EdgeInsets.only(left: 10.0, right: 10.0),
+                        labelText: "Total cost",
+                        hintStyle: const TextStyle(
+                            fontSize: 12.0,
+                            color: style.Colors.grey,
+                            fontWeight: FontWeight.w500),
+                        labelStyle: const TextStyle(
+                            fontSize: 12.0,
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w500),
+                      ),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return "Total cost cannot be blank.";
                         }
                       },
                       autocorrect: false),
@@ -335,7 +380,7 @@ class _RefuelFormState extends State<RefuelForm> {
                       children: <Widget>[
                         SizedBox(
                             height: 45,
-                            child: state is VehicleLoading
+                            child: state is RefuelLoading
                                 ? Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
