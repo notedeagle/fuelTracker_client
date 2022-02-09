@@ -13,9 +13,11 @@ class RefuelForm extends StatefulWidget {
   final RefuelRepository refuelRepository;
   final String carName;
 
-  const RefuelForm(
-      {Key? key, required this.refuelRepository, required this.carName})
-      : super(key: key);
+  const RefuelForm({
+    Key? key,
+    required this.refuelRepository,
+    required this.carName,
+  }) : super(key: key);
 
   @override
   // ignore: no_logic_in_create_state
@@ -41,13 +43,13 @@ class _RefuelFormState extends State<RefuelForm> {
   DateTime selectedDate = DateTime.now();
 
   var _selectedValue;
-  final _categories = ["DIESEL", "GASOLINE", "ELECTRIC", "LPG"];
+  final _categories = ["DIESEL", "GASOLINE", "LPG"];
 
   Future _selectDate() async {
     DatePicker.showDateTimePicker(context,
         showTitleActions: true,
         minTime: DateTime(2020, 1, 1, 0, 0, 0),
-        maxTime: DateTime(2024, 12, 12, 0, 0, 0), onChanged: (date) {
+        maxTime: DateTime(2030, 12, 12, 0, 0, 0), onChanged: (date) {
       setState(() {
         selectedDate = date;
       });
@@ -57,8 +59,8 @@ class _RefuelFormState extends State<RefuelForm> {
   }
 
   String totalCost() {
-    double total =
-        int.parse(_litresController.text) * double.parse(_priceController.text);
+    double total = double.parse(_litresController.text) *
+        double.parse(_priceController.text);
 
     return total.toStringAsFixed(2);
   }
@@ -88,7 +90,8 @@ class _RefuelFormState extends State<RefuelForm> {
             carName: carName,
             fuel: _selectedValue,
             fullTank: fullTank,
-            litres: int.parse(_litresController.text),
+            freeTank: false,
+            litres: double.parse(_litresController.text),
             odometer: int.parse(_odometerController.text),
             price: double.parse(_priceController.text),
             totalCost: double.parse(_totalCostController.text)));

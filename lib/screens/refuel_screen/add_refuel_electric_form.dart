@@ -1,70 +1,123 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_tracker_client/bloc/vehicle_bloc/vehicle_bloc.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_tracker_client/bloc/refuel_bloc/refuel_bloc.dart';
 import 'package:flutter_tracker_client/repositories/repositories.dart';
 import 'package:flutter_tracker_client/screens/main_screen/main_screen.dart';
 import 'package:flutter_tracker_client/style/theme.dart' as style;
+import 'package:intl/intl.dart';
 
-class VehicleForm extends StatefulWidget {
-  final VehicleRepository vehicleRepository;
-  const VehicleForm({Key? key, required this.vehicleRepository})
-      : super(key: key);
+class RefuelElectricForm extends StatefulWidget {
+  final RefuelRepository refuelRepository;
+  final String carName;
+
+  const RefuelElectricForm({
+    Key? key,
+    required this.refuelRepository,
+    required this.carName,
+  }) : super(key: key);
 
   @override
   // ignore: no_logic_in_create_state
-  State<StatefulWidget> createState() => _VehicleFormState(vehicleRepository);
+  State<StatefulWidget> createState() =>
+      _RefuelFormState(refuelRepository, carName);
 }
 
-class _VehicleFormState extends State<VehicleForm> {
-  final VehicleRepository vehicleRepository;
+class _RefuelFormState extends State<RefuelElectricForm> {
+  final RefuelRepository refuelRepository;
+  final String carName;
 
-  _VehicleFormState(this.vehicleRepository);
+  _RefuelFormState(this.refuelRepository, this.carName);
 
-  final _brandController = TextEditingController();
-  final _mileageController = TextEditingController();
-  final _modelController = TextEditingController();
-  final _nameController = TextEditingController();
-  final _plateNumberController = TextEditingController();
-  final _vehicleType = TextEditingController();
-  final _productionYear = TextEditingController();
+  final _dateController = TextEditingController();
+  bool fullTank = false;
+  bool freeTank = false;
+  final _litresController = TextEditingController();
+  final _odometerController = TextEditingController();
+  final _priceController = TextEditingController();
+  final _totalCostController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+
   final _formKey = GlobalKey<FormState>();
+  DateTime selectedDate = DateTime.now();
 
   var _selectedValue;
-  final _categories = ["PETROL", "ELECTRIC"];
+  final _categories = ["DIESEL", "GASOLINE", "LPG"];
+
+  Future _selectDate() async {
+    DatePicker.showDateTimePicker(context,
+        showTitleActions: true,
+        minTime: DateTime(2020, 1, 1, 0, 0, 0),
+        maxTime: DateTime(2030, 12, 12, 0, 0, 0), onChanged: (date) {
+      setState(() {
+        selectedDate = date;
+      });
+      _dateController.text =
+          DateFormat.yMMMEd('en_US').add_Hm().format(selectedDate);
+    });
+  }
+
+  String totalCost() {
+    if (_litresController.text.isNotEmpty) {
+      double total = int.parse(_litresController.text) *
+          double.parse(_priceController.text);
+
+      return total.toStringAsFixed(2);
+    }
+
+    return "";
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus) {
+        _totalCostController.text = totalCost();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     _onAddButtonPressed() {
       if (_formKey.currentState!.validate()) {
-        BlocProvider.of<VehicleBloc>(context).add(AddButtonPressed(
-            brand: _brandController.text,
-            mileage: int.parse(_mileageController.text),
-            model: _modelController.text,
-            name: _nameController.text,
-            plateNumber: _plateNumberController.text,
-            vehicleType: _selectedValue,
-            yearOfProduction: _productionYear.text));
+        BlocProvider.of<RefuelBloc>(context).add(AddButtonPressed(
+            date: selectedDate,
+            carName: carName,
+            fuel: "ELECTRIC",
+            fullTank: fullTank,
+            freeTank: freeTank,
+            litres: double.parse(_litresController.text),
+            odometer: int.parse(_odometerController.text),
+            price: double.parse(_priceController.text),
+            totalCost: double.parse(_totalCostController.text)));
       }
     }
 
-    return BlocListener<VehicleBloc, VehicleState>(
+    return BlocListener<RefuelBloc, RefuelState>(
       listener: (context, state) {
-        if (state is VehicleFailure) {
+        if (state is RefuelFailure) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(state.toString()), backgroundColor: Colors.red));
         }
-        if (state is VehicleInitial) {
+        if (state is RefuelInitial) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text("Vehicle added."), backgroundColor: Colors.green));
+              content: Text("Refuel added."), backgroundColor: Colors.green));
 
           Navigator.pop(context,
               MaterialPageRoute(builder: (context) => const MainScreen()));
         }
       },
-      child: BlocBuilder<VehicleBloc, VehicleState>(
+      child: BlocBuilder<RefuelBloc, RefuelState>(
         builder: (context, state) {
           return Padding(
             padding: const EdgeInsets.only(right: 20.0, left: 20.0, top: 20.0),
@@ -79,7 +132,7 @@ class _VehicleFormState extends State<VehicleForm> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
                         Text(
-                          "ADD NEW VEHICLE",
+                          "ADD NEW REFUEL",
                           style: TextStyle(
                               color: style.Colors.mainColor,
                               fontWeight: FontWeight.bold,
@@ -87,42 +140,6 @@ class _VehicleFormState extends State<VehicleForm> {
                         ),
                       ],
                     ),
-                  ),
-                  TextFormField(
-                    style: const TextStyle(
-                        fontSize: 14.0,
-                        color: style.Colors.titleColor,
-                        fontWeight: FontWeight.bold),
-                    controller: _nameController,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(
-                      fillColor: Colors.white,
-                      prefixIcon: const Icon(
-                        EvaIcons.carOutline,
-                        color: Colors.black26,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Colors.black12),
-                          borderRadius: BorderRadius.circular(30.0)),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(color: style.Colors.mainColor),
-                          borderRadius: BorderRadius.circular(30.0)),
-                      contentPadding:
-                          const EdgeInsets.only(left: 10.0, right: 10.0),
-                      labelText: "Vehicle name",
-                      hintStyle: const TextStyle(
-                          fontSize: 12.0,
-                          color: style.Colors.grey,
-                          fontWeight: FontWeight.w500),
-                      labelStyle: const TextStyle(
-                          fontSize: 12.0,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    validator: (value) =>
-                        value!.isEmpty ? "Vehicle name cannot be blank." : null,
-                    autocorrect: false,
                   ),
                   const SizedBox(
                     height: 20.0,
@@ -132,8 +149,12 @@ class _VehicleFormState extends State<VehicleForm> {
                         fontSize: 14.0,
                         color: style.Colors.titleColor,
                         fontWeight: FontWeight.bold),
-                    controller: _brandController,
-                    keyboardType: TextInputType.text,
+                    controller: _dateController,
+                    keyboardType: TextInputType.datetime,
+                    onTap: () {
+                      _selectDate();
+                      FocusScope.of(context).requestFocus(FocusNode());
+                    },
                     decoration: InputDecoration(
                       prefixIcon: const Icon(EvaIcons.carOutline,
                           color: Colors.black26),
@@ -146,7 +167,7 @@ class _VehicleFormState extends State<VehicleForm> {
                           borderRadius: BorderRadius.circular(30.0)),
                       contentPadding:
                           const EdgeInsets.only(left: 10.0, right: 10.0),
-                      labelText: "Brand",
+                      labelText: "Date",
                       hintStyle: const TextStyle(
                           fontSize: 12.0,
                           color: style.Colors.grey,
@@ -158,7 +179,7 @@ class _VehicleFormState extends State<VehicleForm> {
                     ),
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "Brand cannot be blank.";
+                        return "Date cannot be blank.";
                       }
                     },
                     autocorrect: false,
@@ -167,96 +188,12 @@ class _VehicleFormState extends State<VehicleForm> {
                     height: 20.0,
                   ),
                   TextFormField(
-                    style: const TextStyle(
-                        fontSize: 14.0,
-                        color: style.Colors.titleColor,
-                        fontWeight: FontWeight.bold),
-                    controller: _modelController,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(
-                      fillColor: Colors.white,
-                      prefixIcon: const Icon(
-                        EvaIcons.carOutline,
-                        color: Colors.black26,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Colors.black12),
-                          borderRadius: BorderRadius.circular(30.0)),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(color: style.Colors.mainColor),
-                          borderRadius: BorderRadius.circular(30.0)),
-                      contentPadding:
-                          const EdgeInsets.only(left: 10.0, right: 10.0),
-                      labelText: "Model",
-                      hintStyle: const TextStyle(
-                          fontSize: 12.0,
-                          color: style.Colors.grey,
-                          fontWeight: FontWeight.w500),
-                      labelStyle: const TextStyle(
-                          fontSize: 12.0,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    validator: (value) =>
-                        value!.isEmpty ? "Model cannot be blank." : null,
-                    autocorrect: false,
-                  ),
-                  const SizedBox(
-                    height: 20.0,
-                  ),
-                  TextFormField(
-                    style: const TextStyle(
-                        fontSize: 14.0,
-                        color: style.Colors.titleColor,
-                        fontWeight: FontWeight.bold),
-                    controller: _mileageController,
-                    keyboardType: TextInputType.text,
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
-                    ],
-                    decoration: InputDecoration(
-                      fillColor: Colors.white,
-                      prefixIcon: const Icon(
-                        EvaIcons.carOutline,
-                        color: Colors.black26,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Colors.black12),
-                          borderRadius: BorderRadius.circular(30.0)),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(color: style.Colors.mainColor),
-                          borderRadius: BorderRadius.circular(30.0)),
-                      contentPadding:
-                          const EdgeInsets.only(left: 10.0, right: 10.0),
-                      labelText: "Mileage",
-                      hintStyle: const TextStyle(
-                          fontSize: 12.0,
-                          color: style.Colors.grey,
-                          fontWeight: FontWeight.w500),
-                      labelStyle: const TextStyle(
-                          fontSize: 12.0,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    validator: (value) =>
-                        value!.isEmpty ? "Mileage cannot be blank." : null,
-                    autocorrect: false,
-                  ),
-                  const SizedBox(
-                    height: 20.0,
-                  ),
-                  TextFormField(
                       style: const TextStyle(
                           fontSize: 14.0,
                           color: style.Colors.titleColor,
                           fontWeight: FontWeight.bold),
-                      controller: _productionYear,
+                      controller: _odometerController,
                       keyboardType: const TextInputType.numberWithOptions(),
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
-                      ],
                       decoration: InputDecoration(
                         fillColor: Colors.white,
                         prefixIcon: const Icon(
@@ -272,7 +209,7 @@ class _VehicleFormState extends State<VehicleForm> {
                             borderRadius: BorderRadius.circular(30.0)),
                         contentPadding:
                             const EdgeInsets.only(left: 10.0, right: 10.0),
-                        labelText: "Production year",
+                        labelText: "Odometer",
                         hintStyle: const TextStyle(
                             fontSize: 12.0,
                             color: style.Colors.grey,
@@ -284,10 +221,49 @@ class _VehicleFormState extends State<VehicleForm> {
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
-                          return "Production year cannot be blank.";
+                          return "Odometer cannot be blank.";
                         }
                       },
                       autocorrect: false),
+                  const SizedBox(
+                    height: 20.0,
+                  ),
+                  TextFormField(
+                    style: const TextStyle(
+                        fontSize: 14.0,
+                        color: style.Colors.titleColor,
+                        fontWeight: FontWeight.bold),
+                    controller: _litresController,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(
+                      fillColor: Colors.white,
+                      prefixIcon: const Icon(
+                        EvaIcons.carOutline,
+                        color: Colors.black26,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: Colors.black12),
+                          borderRadius: BorderRadius.circular(30.0)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              const BorderSide(color: style.Colors.mainColor),
+                          borderRadius: BorderRadius.circular(30.0)),
+                      contentPadding:
+                          const EdgeInsets.only(left: 10.0, right: 10.0),
+                      labelText: "kwh",
+                      hintStyle: const TextStyle(
+                          fontSize: 12.0,
+                          color: style.Colors.grey,
+                          fontWeight: FontWeight.w500),
+                      labelStyle: const TextStyle(
+                          fontSize: 12.0,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500),
+                    ),
+                    validator: (value) =>
+                        value!.isEmpty ? "Litres name cannot be blank." : null,
+                    autocorrect: false,
+                  ),
                   const SizedBox(
                     height: 20.0,
                   ),
@@ -296,86 +272,141 @@ class _VehicleFormState extends State<VehicleForm> {
                           fontSize: 14.0,
                           color: style.Colors.titleColor,
                           fontWeight: FontWeight.bold),
-                      controller: _plateNumberController,
-                      decoration: InputDecoration(
-                        fillColor: Colors.white,
-                        prefixIcon: const Icon(
-                          EvaIcons.carOutline,
-                          color: Colors.black26,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: Colors.black12),
-                            borderRadius: BorderRadius.circular(30.0)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                const BorderSide(color: style.Colors.mainColor),
-                            borderRadius: BorderRadius.circular(30.0)),
-                        contentPadding:
-                            const EdgeInsets.only(left: 10.0, right: 10.0),
-                        labelText: "Plate number",
-                        hintStyle: const TextStyle(
-                            fontSize: 12.0,
-                            color: style.Colors.grey,
-                            fontWeight: FontWeight.w500),
-                        labelStyle: const TextStyle(
-                            fontSize: 12.0,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w500),
-                      ),
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "Plate number cannot be blank.";
-                        }
-                      },
-                      autocorrect: false),
-                  const SizedBox(
-                    height: 20.0,
-                  ),
-                  DropdownButtonFormField(
-                      decoration: InputDecoration(
-                        fillColor: Colors.white,
-                        prefixIcon: const Icon(
-                          EvaIcons.carOutline,
-                          color: Colors.black26,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: Colors.black12),
-                            borderRadius: BorderRadius.circular(30.0)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                const BorderSide(color: style.Colors.mainColor),
-                            borderRadius: BorderRadius.circular(30.0)),
-                        contentPadding:
-                            const EdgeInsets.only(left: 10.0, right: 10.0),
-                        labelText: "Vehicle type",
-                        hintStyle: const TextStyle(
-                            fontSize: 12.0,
-                            color: style.Colors.grey,
-                            fontWeight: FontWeight.w500),
-                        labelStyle: const TextStyle(
-                            fontSize: 12.0,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w500),
-                      ),
-                      items: _categories.map((String dropDownStringItem) {
-                        return DropdownMenuItem<String>(
-                            value: dropDownStringItem,
-                            child: Text(dropDownStringItem));
-                      }).toList(),
-                      value: _selectedValue,
-                      hint: const Text("Vehicle type"),
-                      validator: (value) {
-                        if (value == null) {
-                          return "Brand cannot be blank.";
-                        }
-                      },
+                      controller: _priceController,
                       onChanged: (value) {
                         setState(() {
-                          _selectedValue = value;
+                          freeTank = false;
                         });
-                      }),
+                      },
+                      decoration: InputDecoration(
+                        fillColor: Colors.white,
+                        prefixIcon: const Icon(
+                          EvaIcons.carOutline,
+                          color: Colors.black26,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(color: Colors.black12),
+                            borderRadius: BorderRadius.circular(30.0)),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: style.Colors.mainColor),
+                            borderRadius: BorderRadius.circular(30.0)),
+                        contentPadding:
+                            const EdgeInsets.only(left: 10.0, right: 10.0),
+                        labelText: "Price",
+                        hintStyle: const TextStyle(
+                            fontSize: 12.0,
+                            color: style.Colors.grey,
+                            fontWeight: FontWeight.w500),
+                        labelStyle: const TextStyle(
+                            fontSize: 12.0,
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w500),
+                      ),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return "Price cannot be blank.";
+                        }
+                      },
+                      autocorrect: false),
                   const SizedBox(
-                    height: 50.0,
+                    height: 20.0,
+                  ),
+                  TextFormField(
+                      style: const TextStyle(
+                          fontSize: 14.0,
+                          color: style.Colors.titleColor,
+                          fontWeight: FontWeight.bold),
+                      controller: _totalCostController,
+                      focusNode: _focusNode,
+                      onChanged: (value) {
+                        setState(() {
+                          freeTank = false;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        fillColor: Colors.white,
+                        prefixIcon: const Icon(
+                          EvaIcons.carOutline,
+                          color: Colors.black26,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(color: Colors.black12),
+                            borderRadius: BorderRadius.circular(30.0)),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: style.Colors.mainColor),
+                            borderRadius: BorderRadius.circular(30.0)),
+                        contentPadding:
+                            const EdgeInsets.only(left: 10.0, right: 10.0),
+                        labelText: "Total cost",
+                        hintStyle: const TextStyle(
+                            fontSize: 12.0,
+                            color: style.Colors.grey,
+                            fontWeight: FontWeight.w500),
+                        labelStyle: const TextStyle(
+                            fontSize: 12.0,
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w500),
+                      ),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return "Total cost cannot be blank.";
+                        }
+                      },
+                      autocorrect: false),
+                  const SizedBox(
+                    height: 20.0,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(color: style.Colors.grey),
+                        borderRadius: BorderRadius.circular(30.0)),
+                    child: CheckboxListTile(
+                        title: const Text(
+                          "Free charge",
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        value: freeTank,
+                        activeColor: style.Colors.mainColor,
+                        onChanged: (newValue) => setState(() {
+                              freeTank = newValue!;
+
+                              if (freeTank) {
+                                _totalCostController.text = "0";
+                                _priceController.text = "0";
+                              }
+                            })),
+                  ),
+                  const SizedBox(
+                    height: 20.0,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(color: style.Colors.grey),
+                        borderRadius: BorderRadius.circular(30.0)),
+                    child: CheckboxListTile(
+                        title: const Text(
+                          "Full tank",
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        value: fullTank,
+                        activeColor: style.Colors.mainColor,
+                        onChanged: (newValue) => setState(() {
+                              fullTank = newValue!;
+                            })),
+                  ),
+                  const SizedBox(
+                    height: 30.0,
+                  ),
+                  const SizedBox(
+                    height: 20.0,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 30.0, bottom: 10.0),
@@ -384,7 +415,7 @@ class _VehicleFormState extends State<VehicleForm> {
                       children: <Widget>[
                         SizedBox(
                             height: 45,
-                            child: state is VehicleLoading
+                            child: state is RefuelLoading
                                 ? Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,

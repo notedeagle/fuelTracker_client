@@ -85,7 +85,7 @@ class RefuelRepository {
       String carName,
       String fuel,
       bool fullTank,
-      int litres,
+      double litres,
       int odometer,
       double price,
       double totalCost) async {
@@ -157,7 +157,7 @@ class VehicleRepository {
           "model": model,
           "name": name,
           "plateNumber": plateNumber,
-          "vehicleType": "PETROL",
+          "vehicleType": vehicleType,
           "yearOfProduction": yearOfProduction
         }),
         headers: {

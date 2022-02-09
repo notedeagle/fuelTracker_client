@@ -9,7 +9,8 @@ class AddButtonPressed extends RefuelEvent {
   final String carName;
   final String fuel;
   final bool fullTank;
-  final int litres;
+  final bool freeTank;
+  final double litres;
   final int odometer;
   final double price;
   final double totalCost;
@@ -19,6 +20,7 @@ class AddButtonPressed extends RefuelEvent {
       required this.carName,
       required this.fuel,
       required this.fullTank,
+      required this.freeTank,
       required this.litres,
       required this.odometer,
       required this.price,

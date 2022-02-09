@@ -28,8 +28,9 @@ class _VehicleScreenState extends State<VehicleScreen> {
                 child: ListView(
                   padding: EdgeInsets.zero,
                   children: [
-                    const SizedBox(
-                      height: 100,
+                    const DrawerHeader(
+                      decoration: BoxDecoration(color: style.Colors.mainColor),
+                      child: Text(""),
                     ),
                     ListTile(
                       leading: const Icon(Icons.input),
@@ -121,6 +122,12 @@ class _VehicleScreenState extends State<VehicleScreen> {
                                             ),
                                             Text(
                                               data[index].model,
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 14.0),
+                                            ),
+                                            Text(
+                                              data[index].vehicleType,
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 14.0),
