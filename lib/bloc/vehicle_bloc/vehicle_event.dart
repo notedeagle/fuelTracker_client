@@ -6,7 +6,6 @@ abstract class VehicleEvent extends Equatable {
 
 class AddButtonPressed extends VehicleEvent {
   final String brand;
-  final int mileage;
   final String model;
   final String name;
   final String plateNumber;
@@ -15,7 +14,6 @@ class AddButtonPressed extends VehicleEvent {
 
   const AddButtonPressed(
       {required this.brand,
-      required this.mileage,
       required this.model,
       required this.name,
       required this.plateNumber,
@@ -24,11 +22,10 @@ class AddButtonPressed extends VehicleEvent {
 
   @override
   List<Object> get props =>
-      [brand, mileage, model, name, plateNumber, vehicleType, yearOfProduction];
+      [brand, model, name, plateNumber, vehicleType, yearOfProduction];
 
   @override
-  String toString() =>
-      'RegisterButtonPressed { brand: $brand, mileage: $mileage, model: $model, '
+  String toString() => 'RegisterButtonPressed { brand: $brand, model: $model, '
       'name: $name, plateNumber: $plateNumber, vehicleType: $vehicleType, '
       'yearOfProduction: $yearOfProduction}';
 }

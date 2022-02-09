@@ -1,6 +1,5 @@
 class VehicleDto {
   String brand;
-  int mileage;
   String model;
   String name;
   String plateNumber;
@@ -9,7 +8,6 @@ class VehicleDto {
 
   VehicleDto(
       {required this.brand,
-      required this.mileage,
       required this.model,
       required this.name,
       required this.plateNumber,
@@ -19,7 +17,6 @@ class VehicleDto {
   factory VehicleDto.fromJson(Map<String, dynamic> json) {
     return VehicleDto(
         brand: json['brand'] as String,
-        mileage: json['mileage'] as int,
         model: json['model'] as String,
         name: json['name'] as String,
         plateNumber: json['plateNumber'] as String,

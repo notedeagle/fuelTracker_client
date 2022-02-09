@@ -9,12 +9,14 @@ class AddRefuelScreen extends StatelessWidget {
   final RefuelRepository refuelRepository;
   final String carName;
   final String vehicleType;
+  final int lastOdometer;
 
   const AddRefuelScreen(
       {Key? key,
       required this.refuelRepository,
       required this.carName,
-      required this.vehicleType})
+      required this.vehicleType,
+      required this.lastOdometer})
       : super(key: key);
 
   @override
@@ -22,12 +24,13 @@ class AddRefuelScreen extends StatelessWidget {
     if (vehicleType == "PETROL") {
       return Scaffold(
         body: BlocProvider(
-          create: (context) {
-            return RefuelBloc(refuelRepository: refuelRepository);
-          },
-          child:
-              RefuelForm(refuelRepository: refuelRepository, carName: carName),
-        ),
+            create: (context) {
+              return RefuelBloc(refuelRepository: refuelRepository);
+            },
+            child: RefuelForm(
+                refuelRepository: refuelRepository,
+                carName: carName,
+                lastOdometer: lastOdometer)),
       );
     } else {
       return Scaffold(
@@ -36,7 +39,9 @@ class AddRefuelScreen extends StatelessWidget {
             return RefuelBloc(refuelRepository: refuelRepository);
           },
           child: RefuelElectricForm(
-              refuelRepository: refuelRepository, carName: carName),
+              refuelRepository: refuelRepository,
+              carName: carName,
+              lastOdometer: lastOdometer),
         ),
       );
     }

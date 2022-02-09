@@ -12,24 +12,27 @@ import 'package:intl/intl.dart';
 class RefuelElectricForm extends StatefulWidget {
   final RefuelRepository refuelRepository;
   final String carName;
+  final int lastOdometer;
 
-  const RefuelElectricForm({
-    Key? key,
-    required this.refuelRepository,
-    required this.carName,
-  }) : super(key: key);
+  const RefuelElectricForm(
+      {Key? key,
+      required this.refuelRepository,
+      required this.carName,
+      required this.lastOdometer})
+      : super(key: key);
 
   @override
   // ignore: no_logic_in_create_state
   State<StatefulWidget> createState() =>
-      _RefuelFormState(refuelRepository, carName);
+      _RefuelFormState(refuelRepository, carName, lastOdometer);
 }
 
 class _RefuelFormState extends State<RefuelElectricForm> {
   final RefuelRepository refuelRepository;
   final String carName;
+  final int lastOdometer;
 
-  _RefuelFormState(this.refuelRepository, this.carName);
+  _RefuelFormState(this.refuelRepository, this.carName, this.lastOdometer);
 
   final _dateController = TextEditingController();
   bool fullTank = false;
@@ -59,7 +62,7 @@ class _RefuelFormState extends State<RefuelElectricForm> {
     });
   }
 
-  String totalCost() {
+  totalCost() {
     if (_litresController.text.isNotEmpty) {
       double total = int.parse(_litresController.text) *
           double.parse(_priceController.text);
@@ -68,6 +71,12 @@ class _RefuelFormState extends State<RefuelElectricForm> {
     }
 
     return "";
+  }
+
+  afc(double litres, int odometer, int prevOdometer) {
+    double afc = litres / (odometer - prevOdometer) * 100;
+
+    return afc.toStringAsFixed(2);
   }
 
   @override
@@ -89,7 +98,13 @@ class _RefuelFormState extends State<RefuelElectricForm> {
   @override
   Widget build(BuildContext context) {
     _onAddButtonPressed() {
+      double avg = 0;
       if (_formKey.currentState!.validate()) {
+        if (lastOdometer != 0) {
+          avg = afc(double.parse(_litresController.text),
+              int.parse(_odometerController.text), lastOdometer);
+        }
+
         BlocProvider.of<RefuelBloc>(context).add(AddButtonPressed(
             date: selectedDate,
             carName: carName,
@@ -97,6 +112,7 @@ class _RefuelFormState extends State<RefuelElectricForm> {
             fullTank: fullTank,
             freeTank: freeTank,
             litres: double.parse(_litresController.text),
+            avg: avg,
             odometer: int.parse(_odometerController.text),
             price: double.parse(_priceController.text),
             totalCost: double.parse(_totalCostController.text)));

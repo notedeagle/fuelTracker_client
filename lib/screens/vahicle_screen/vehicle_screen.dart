@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tracker_client/bloc/auth_bloc/auth.dart';
 import 'package:flutter_tracker_client/dto/vehicle_dto.dart';
 import 'package:flutter_tracker_client/repositories/repositories.dart';
-import 'package:flutter_tracker_client/screens/main_screen/main_screen.dart';
 import 'package:flutter_tracker_client/screens/vahicle_screen/add_vehicle_screen.dart';
 import 'package:flutter_tracker_client/style/theme.dart' as style;
 
@@ -125,12 +124,6 @@ class _VehicleScreenState extends State<VehicleScreen> {
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 14.0),
-                                            ),
-                                            Text(
-                                              data[index].vehicleType,
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 14.0),
                                             )
                                           ],
                                         ),
@@ -143,13 +136,6 @@ class _VehicleScreenState extends State<VehicleScreen> {
                                         child: Column(
                                           children: [
                                             Text(
-                                              data[index].mileage.toString() +
-                                                  " km",
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 14.0),
-                                            ),
-                                            Text(
                                               data[index].plateNumber,
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
@@ -159,6 +145,12 @@ class _VehicleScreenState extends State<VehicleScreen> {
                                               data[index]
                                                   .yearOfProduction
                                                   .toString(),
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 14.0),
+                                            ),
+                                            Text(
+                                              data[index].vehicleType,
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 14.0),

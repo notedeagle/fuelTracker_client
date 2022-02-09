@@ -22,6 +22,7 @@ class RefuelBloc extends Bloc<RefuelEvent, RefuelState> {
             event.fuel,
             event.fullTank,
             event.litres,
+            event.avg,
             event.odometer,
             event.price,
             event.totalCost);

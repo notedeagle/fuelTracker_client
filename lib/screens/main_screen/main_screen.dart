@@ -5,14 +5,13 @@ import 'package:flutter_tracker_client/bloc/auth_bloc/auth.dart';
 import 'package:flutter_tracker_client/dto/refuel_dto.dart';
 import 'package:flutter_tracker_client/dto/vehicle_dto.dart';
 import 'package:flutter_tracker_client/repositories/repositories.dart';
+import 'package:flutter_tracker_client/screens/main_screen/raport_screen.dart';
 import 'package:flutter_tracker_client/screens/refuel_screen/add_refuel_screen.dart';
 import 'package:flutter_tracker_client/screens/vahicle_screen/vehicle_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_tracker_client/style/theme.dart' as style;
 
 class MainScreen extends StatefulWidget {
-  static RefuelRepository refuelRepository = RefuelRepository();
-
   const MainScreen({Key? key}) : super(key: key);
 
   @override
@@ -24,12 +23,7 @@ class _MainScreenState extends State<MainScreen> {
   var refuelRepository = RefuelRepository();
   String vehicleValue = "";
   String vehicleType = "";
-
-  String afc(double litres, int odometer, int prevOdometer) {
-    double afc = litres / (odometer - prevOdometer) * 100;
-
-    return afc.toStringAsFixed(2);
-  }
+  int lastOdometer = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -41,8 +35,8 @@ class _MainScreenState extends State<MainScreen> {
           if (cars!.isNotEmpty) {
             if (vehicleValue == "") {
               vehicleValue = cars[0].name;
-              vehicleType = cars[0].vehicleType;
             }
+            vehicleType = cars[0].vehicleType;
             return Scaffold(
                 endDrawer: Drawer(
                   child: ListView(
@@ -67,7 +61,14 @@ class _MainScreenState extends State<MainScreen> {
                       ListTile(
                         leading: const Icon(Icons.input),
                         title: const Text("Raports"),
-                        onTap: () => {}, //add route to raports
+                        onTap: () => {
+                          Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          RaportScreen(carName: vehicleValue)))
+                              .then((_) => setState(() {}))
+                        }, //add route to raports
                       ),
                       ListTile(
                         leading: const Icon(EvaIcons.logOutOutline),
@@ -134,6 +135,9 @@ class _MainScreenState extends State<MainScreen> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       List<RefuelDto>? data = snapshot.data;
+                      if (data!.length > 1) {
+                        lastOdometer = data[data.length - 1].odometer;
+                      }
                       if (vehicleType == "PETROL") {
                         return Container(
                             padding: const EdgeInsets.only(top: 4),
@@ -257,12 +261,10 @@ class _MainScreenState extends State<MainScreen> {
                                                 if (data.length > 1 &&
                                                     index != 0) ...[
                                                   Text(
-                                                    afc(
-                                                            data[index].litres,
-                                                            data[index]
-                                                                .odometer,
-                                                            data[index - 1]
-                                                                .odometer) +
+                                                    data[index]
+                                                            .avg
+                                                            .toStringAsFixed(
+                                                                2) +
                                                         "l/100km",
                                                     style: const TextStyle(
                                                         fontWeight:
@@ -399,12 +401,10 @@ class _MainScreenState extends State<MainScreen> {
                                                 if (data.length > 1 &&
                                                     index != 0) ...[
                                                   Text(
-                                                    afc(
-                                                            data[index].litres,
-                                                            data[index]
-                                                                .odometer,
-                                                            data[index - 1]
-                                                                .odometer) +
+                                                    data[index]
+                                                            .avg
+                                                            .toStringAsFixed(
+                                                                2) +
                                                         "kwh/100km",
                                                     style: const TextStyle(
                                                         fontWeight:
@@ -435,6 +435,7 @@ class _MainScreenState extends State<MainScreen> {
                                     refuelRepository: refuelRepository,
                                     carName: vehicleValue,
                                     vehicleType: vehicleType,
+                                    lastOdometer: lastOdometer,
                                   ))).then((_) => setState(() {}));
                     },
                     icon: const Icon(Icons.add),

@@ -86,6 +86,7 @@ class RefuelRepository {
       String fuel,
       bool fullTank,
       double litres,
+      double avg,
       int odometer,
       double price,
       double totalCost) async {
@@ -97,6 +98,7 @@ class RefuelRepository {
           "fuel": fuel,
           "fullTank": fullTank,
           "litres": litres,
+          "avg": avg,
           "odometer": odometer,
           "price": price,
           "totalCost": totalCost
@@ -140,20 +142,13 @@ class VehicleRepository {
     }
   }
 
-  Future<http.Response> addVehicle(
-      String brand,
-      int mileage,
-      String model,
-      String name,
-      String plateNumber,
-      String vehicleType,
-      String yearOfProduction) async {
+  Future<http.Response> addVehicle(String brand, String model, String name,
+      String plateNumber, String vehicleType, String yearOfProduction) async {
     var token = await storage.read(key: 'token');
 
     final response = await http.post(Uri.parse(customerVehicles),
         body: jsonEncode({
           "brand": brand,
-          "mileage": mileage,
           "model": model,
           "name": name,
           "plateNumber": plateNumber,

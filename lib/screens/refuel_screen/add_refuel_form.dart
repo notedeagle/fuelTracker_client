@@ -12,24 +12,27 @@ import 'package:intl/intl.dart';
 class RefuelForm extends StatefulWidget {
   final RefuelRepository refuelRepository;
   final String carName;
+  final int lastOdometer;
 
-  const RefuelForm({
-    Key? key,
-    required this.refuelRepository,
-    required this.carName,
-  }) : super(key: key);
+  const RefuelForm(
+      {Key? key,
+      required this.refuelRepository,
+      required this.carName,
+      required this.lastOdometer})
+      : super(key: key);
 
   @override
   // ignore: no_logic_in_create_state
   State<StatefulWidget> createState() =>
-      _RefuelFormState(refuelRepository, carName);
+      _RefuelFormState(refuelRepository, carName, lastOdometer);
 }
 
 class _RefuelFormState extends State<RefuelForm> {
   final RefuelRepository refuelRepository;
   final String carName;
+  final int lastOdometer;
 
-  _RefuelFormState(this.refuelRepository, this.carName);
+  _RefuelFormState(this.refuelRepository, this.carName, this.lastOdometer);
 
   final _dateController = TextEditingController();
   bool fullTank = false;
@@ -49,7 +52,7 @@ class _RefuelFormState extends State<RefuelForm> {
     DatePicker.showDateTimePicker(context,
         showTitleActions: true,
         minTime: DateTime(2020, 1, 1, 0, 0, 0),
-        maxTime: DateTime(2030, 12, 12, 0, 0, 0), onChanged: (date) {
+        maxTime: DateTime.now(), onChanged: (date) {
       setState(() {
         selectedDate = date;
       });
@@ -58,11 +61,17 @@ class _RefuelFormState extends State<RefuelForm> {
     });
   }
 
-  String totalCost() {
+  totalCost() {
     double total = double.parse(_litresController.text) *
         double.parse(_priceController.text);
 
     return total.toStringAsFixed(2);
+  }
+
+  afc(double litres, int odometer, int prevOdometer) {
+    double afc = litres / (odometer - prevOdometer) * 100;
+
+    return afc.toStringAsFixed(2);
   }
 
   @override
@@ -84,11 +93,18 @@ class _RefuelFormState extends State<RefuelForm> {
   @override
   Widget build(BuildContext context) {
     _onAddButtonPressed() {
+      double avg = 0;
       if (_formKey.currentState!.validate()) {
+        if (int.parse(_odometerController.text) != 0) {
+          avg = double.parse(afc(double.parse(_litresController.text),
+              int.parse(_odometerController.text), lastOdometer));
+        }
+
         BlocProvider.of<RefuelBloc>(context).add(AddButtonPressed(
             date: selectedDate,
             carName: carName,
             fuel: _selectedValue,
+            avg: avg,
             fullTank: fullTank,
             freeTank: false,
             litres: double.parse(_litresController.text),

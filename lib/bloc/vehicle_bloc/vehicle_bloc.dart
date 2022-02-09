@@ -18,7 +18,6 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
       try {
         var response = await vehicleRepository.addVehicle(
             event.brand,
-            event.mileage,
             event.model,
             event.name,
             event.plateNumber,
