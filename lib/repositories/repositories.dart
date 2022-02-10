@@ -86,7 +86,6 @@ class RefuelRepository {
       String fuel,
       bool fullTank,
       double litres,
-      double avg,
       int odometer,
       double price,
       double totalCost) async {
@@ -98,7 +97,6 @@ class RefuelRepository {
           "fuel": fuel,
           "fullTank": fullTank,
           "litres": litres,
-          "avg": avg,
           "odometer": odometer,
           "price": price,
           "totalCost": totalCost

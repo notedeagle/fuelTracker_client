@@ -27,9 +27,13 @@ class RefuelDto {
         fuel: json['fuel'] as String,
         fullTank: json['fullTank'] as bool,
         litres: json['litres'] as double,
-        avg: json['avg'] as double,
+        avg: 0,
         odometer: json['odometer'] as int,
         totalCost: json['totalCost'] as double,
         price: json['price'] as double);
+  }
+
+  setAvg(double avg) {
+    this.avg = avg;
   }
 }

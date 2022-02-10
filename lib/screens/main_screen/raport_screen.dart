@@ -37,13 +37,23 @@ class _RaportScreenState extends State<RaportScreen> {
   }
 
   perDay(List<RefuelDto> list) {
-    final days = list.last.date.difference(list.first.date);
+    final days =
+        (list.last.date.difference(list.first.date).inHours / 24).round();
 
-    return sumCost(list) / days.inDays;
+    if (days == 0) {
+      return 0;
+    }
+
+    return sumCost(list) / days;
   }
 
   perKm(List<RefuelDto> list) {
     final km = list.last.odometer - list.first.odometer;
+
+    if (km == 0) {
+      return 0;
+    }
+
     return sumCost(list) / km;
   }
 
@@ -58,7 +68,24 @@ class _RaportScreenState extends State<RaportScreen> {
   }
 
   avgLitres(List<RefuelDto> list) {
-    return 0;
+    list.removeAt(0);
+    double sum = 0;
+
+    if (list.length == 1) {
+      return list[0].avg;
+    }
+
+    for (var element in list) {
+      sum += element.avg;
+    }
+
+    return sum / list.length;
+  }
+
+  avg(RefuelDto data, RefuelDto data2) {
+    final km = data.odometer - data2.odometer;
+
+    return data.litres / km * 100;
   }
 
   @override
@@ -111,6 +138,10 @@ class _RaportScreenState extends State<RaportScreen> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               List<RefuelDto>? data = snapshot.data;
+              data!.sort((a, b) => a.date.compareTo(b.date));
+              for (int i = 1; i < data.length; i++) {
+                data[i].setAvg(avg(data[i], data[i - 1]));
+              }
               return SingleChildScrollView(
                 child: Column(
                   children: [
@@ -315,7 +346,8 @@ class _RaportScreenState extends State<RaportScreen> {
                                   height: 10,
                                 ),
                                 Text(
-                                  avgLitres(data).toStringAsFixed(2) + "zl",
+                                  avgLitres(data).toStringAsFixed(2) +
+                                      "l/100km",
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16.0),
@@ -364,9 +396,6 @@ class _RaportScreenState extends State<RaportScreen> {
                           ),
                           Row(
                             children: [
-                              const SizedBox(
-                                width: 10,
-                              ),
                               Column(
                                 children: [
                                   const Text(
@@ -379,15 +408,16 @@ class _RaportScreenState extends State<RaportScreen> {
                                     height: 10,
                                   ),
                                   Text(
-                                    sumCost(data).toStringAsFixed(2) + "zl",
+                                    data.last.avg.toStringAsFixed(2) +
+                                        "l/100km",
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 16.0),
+                                        fontSize: 14.0),
                                   ),
                                 ],
                               ),
                               const SizedBox(
-                                width: 50,
+                                width: 40,
                               ),
                               Column(children: [
                                 const Text(
@@ -400,14 +430,21 @@ class _RaportScreenState extends State<RaportScreen> {
                                   height: 10,
                                 ),
                                 Text(
-                                  perDay(data).toStringAsFixed(2) + "zl",
+                                  data
+                                          .reduce((value, element) =>
+                                              value.avg < element.avg
+                                                  ? value
+                                                  : element)
+                                          .avg
+                                          .toStringAsFixed(2) +
+                                      "l/100km",
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 16.0),
+                                      fontSize: 14.0),
                                 ),
                               ]),
                               const SizedBox(
-                                width: 50,
+                                width: 40,
                               ),
                               Column(children: [
                                 const Text(
@@ -420,10 +457,17 @@ class _RaportScreenState extends State<RaportScreen> {
                                   height: 10,
                                 ),
                                 Text(
-                                  perKm(data).toStringAsFixed(2) + "zl",
+                                  data
+                                          .reduce((value, element) =>
+                                              value.avg > element.avg
+                                                  ? value
+                                                  : element)
+                                          .avg
+                                          .toStringAsFixed(2) +
+                                      "l/100km",
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 16.0),
+                                      fontSize: 14.0),
                                 ),
                               ])
                             ],

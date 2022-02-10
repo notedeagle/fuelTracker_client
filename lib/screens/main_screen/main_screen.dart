@@ -25,6 +25,12 @@ class _MainScreenState extends State<MainScreen> {
   String vehicleType = "";
   int lastOdometer = 0;
 
+  avg(RefuelDto data, RefuelDto data2) {
+    final km = data.odometer - data2.odometer;
+
+    return data.litres / km * 100;
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<VehicleDto>>(
@@ -135,14 +141,15 @@ class _MainScreenState extends State<MainScreen> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       List<RefuelDto>? data = snapshot.data;
-                      if (data!.length > 1) {
+                      data!.sort((a, b) => a.date.compareTo(b.date));
+                      if (data.length > 1) {
                         lastOdometer = data[data.length - 1].odometer;
                       }
                       if (vehicleType == "PETROL") {
                         return Container(
                             padding: const EdgeInsets.only(top: 4),
                             child: ListView.separated(
-                                itemCount: data!.length,
+                                itemCount: data.length,
                                 separatorBuilder: (context, index) =>
                                     const SizedBox(height: 4),
                                 itemBuilder: (BuildContext conext, int index) {
@@ -261,8 +268,8 @@ class _MainScreenState extends State<MainScreen> {
                                                 if (data.length > 1 &&
                                                     index != 0) ...[
                                                   Text(
-                                                    data[index]
-                                                            .avg
+                                                    avg(data[index],
+                                                                data[index - 1])
                                                             .toStringAsFixed(
                                                                 2) +
                                                         "l/100km",
