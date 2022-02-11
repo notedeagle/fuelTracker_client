@@ -5,13 +5,13 @@ import 'package:flutter_tracker_client/bloc/auth_bloc/auth.dart';
 import 'package:flutter_tracker_client/dto/refuel_dto.dart';
 import 'package:flutter_tracker_client/dto/vehicle_dto.dart';
 import 'package:flutter_tracker_client/repositories/repositories.dart';
+import 'package:flutter_tracker_client/screens/main_screen/raport_screen.dart';
+import 'package:flutter_tracker_client/screens/refuel_screen/add_refuel_screen.dart';
 import 'package:flutter_tracker_client/screens/vahicle_screen/vehicle_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_tracker_client/style/theme.dart' as style;
 
 class MainScreen extends StatefulWidget {
-  static RefuelRepository refuelRepository = RefuelRepository();
-
   const MainScreen({Key? key}) : super(key: key);
 
   @override
@@ -20,7 +20,16 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   var vehicleRepository = VehicleRepository();
-  late String vehicleValue = "";
+  var refuelRepository = RefuelRepository();
+  String vehicleValue = "";
+  String vehicleType = "";
+  int lastOdometer = 0;
+
+  avg(RefuelDto data, RefuelDto data2) {
+    final km = data.odometer - data2.odometer;
+
+    return data.litres / km * 100;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,174 +42,390 @@ class _MainScreenState extends State<MainScreen> {
             if (vehicleValue == "") {
               vehicleValue = cars[0].name;
             }
+            vehicleType = cars[0].vehicleType;
             return Scaffold(
-                appBar: AppBar(
-                  backgroundColor: style.Colors.mainColor,
-                  title: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                endDrawer: Drawer(
+                  child: ListView(
+                    padding: EdgeInsets.zero,
                     children: [
-                      DropdownButton<String>(
-                          value: vehicleValue,
-                          selectedItemBuilder: (_) {
-                            return cars
-                                .map((e) => Container(
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        e.name,
-                                        style: const TextStyle(
-                                            color: Colors.white),
-                                      ),
-                                    ))
-                                .toList();
-                          },
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14),
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              vehicleValue = newValue!;
-                            });
-                          },
-                          items: cars.map<DropdownMenuItem<String>>(
-                              (VehicleDto value) {
-                            return DropdownMenuItem<String>(
-                              value: value.name,
-                              child: Text(value.name,
-                                  style: const TextStyle(color: Colors.black)),
-                            );
-                          }).toList()),
-                      const SizedBox(width: 30),
-                      const Text("Fuel tracker"),
-                    ],
-                  ),
-                  actions: [
-                    IconButton(
-                      icon: const Icon(EvaIcons.fileAdd),
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const VehicleScreen()));
-                      },
-                    ),
-                    IconButton(
-                        icon: const Icon(EvaIcons.logOutOutline),
-                        onPressed: () {
+                      const DrawerHeader(
+                        decoration:
+                            BoxDecoration(color: style.Colors.mainColor),
+                        child: Text(""),
+                      ),
+                      ListTile(
+                          leading: const Icon(EvaIcons.fileAdd),
+                          title: const Text("Vehicles"),
+                          onTap: () {
+                            Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const VehicleScreen()))
+                                .then((_) => setState(() {}));
+                          }),
+                      ListTile(
+                        leading: const Icon(Icons.input),
+                        title: const Text("Raports"),
+                        onTap: () => {
+                          Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          RaportScreen(carName: vehicleValue)))
+                              .then((_) => setState(() {}))
+                        }, //add route to raports
+                      ),
+                      ListTile(
+                        leading: const Icon(EvaIcons.logOutOutline),
+                        title: const Text("Log out"),
+                        onTap: () {
                           BlocProvider.of<AuthenticationBloc>(context).add(
                             LoggedOut(),
                           );
-                        }),
-                  ],
+                        },
+                      )
+                    ],
+                  ),
                 ),
+                appBar: AppBar(
+                    backgroundColor: style.Colors.mainColor,
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        DropdownButton<String>(
+                            value: vehicleValue,
+                            selectedItemBuilder: (_) {
+                              return cars
+                                  .map((e) => Container(
+                                        width: 50,
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          e.name,
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        ),
+                                      ))
+                                  .toList();
+                            },
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                vehicleValue = newValue!;
+                                vehicleType = cars
+                                    .where((element) =>
+                                        element.name == vehicleValue)
+                                    .first
+                                    .vehicleType;
+                              });
+                            },
+                            items: cars.map<DropdownMenuItem<String>>(
+                                (VehicleDto value) {
+                              return DropdownMenuItem<String>(
+                                value: value.name,
+                                child: Text(value.name,
+                                    style:
+                                        const TextStyle(color: Colors.black)),
+                              );
+                            }).toList()),
+                        const SizedBox(width: 30),
+                        const Center(child: Text("Fuel tracker"))
+                      ],
+                    )),
                 body: Center(
                     child: FutureBuilder<List<RefuelDto>>(
                   future: RefuelRepository().getRefuelByCarName(vehicleValue),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       List<RefuelDto>? data = snapshot.data;
-                      return Container(
-                          padding: const EdgeInsets.only(top: 4),
-                          child: ListView.separated(
-                              itemCount: data!.length,
-                              separatorBuilder: (context, index) =>
-                                  const SizedBox(height: 4),
-                              itemBuilder: (BuildContext conext, int index) {
-                                return Container(
-                                    padding: const EdgeInsets.only(
-                                        top: 10, bottom: 10),
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: const BorderRadius.only(
-                                            topLeft: Radius.circular(10),
-                                            topRight: Radius.circular(10),
-                                            bottomLeft: Radius.circular(10),
-                                            bottomRight: Radius.circular(10)),
-                                        boxShadow: [
-                                          BoxShadow(
-                                              color:
-                                                  Colors.grey.withOpacity(0.5),
-                                              spreadRadius: 5,
-                                              blurRadius: 7,
-                                              offset: const Offset(0, 3))
-                                        ]),
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          height: 100,
-                                          width: 200,
-                                          padding: const EdgeInsets.only(
-                                              top: 15, left: 15, right: 15),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                DateFormat(
-                                                        'dd-MM-yyyy\nHH:mm:ss')
-                                                    .format(data[index].date),
-                                                style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 14.0),
-                                              ),
-                                              Text(
-                                                vehicleValue,
-                                                style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 14.0),
-                                              ),
-                                            ],
+                      data!.sort((a, b) => a.date.compareTo(b.date));
+                      if (data.length > 1) {
+                        lastOdometer = data[data.length - 1].odometer;
+                      }
+                      if (vehicleType == "PETROL") {
+                        return Container(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: ListView.separated(
+                                itemCount: data.length,
+                                separatorBuilder: (context, index) =>
+                                    const SizedBox(height: 4),
+                                itemBuilder: (BuildContext conext, int index) {
+                                  return Container(
+                                      padding: const EdgeInsets.only(
+                                          top: 10, bottom: 10),
+                                      decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: const BorderRadius.only(
+                                              topLeft: Radius.circular(10),
+                                              topRight: Radius.circular(10),
+                                              bottomLeft: Radius.circular(10),
+                                              bottomRight: Radius.circular(10)),
+                                          boxShadow: [
+                                            BoxShadow(
+                                                color: Colors.grey
+                                                    .withOpacity(0.5),
+                                                spreadRadius: 5,
+                                                blurRadius: 7,
+                                                offset: const Offset(0, 3))
+                                          ]),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            height: 115,
+                                            width: 150,
+                                            padding: const EdgeInsets.only(
+                                                top: 15, left: 15, right: 15),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  DateFormat(
+                                                          'dd-MM-yyyy\nHH:mm:ss')
+                                                      .format(data[index].date),
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 14.0),
+                                                ),
+                                                Text(
+                                                  vehicleValue,
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 14.0),
+                                                ),
+                                                IconButton(
+                                                  icon: const Icon(
+                                                      EvaIcons.trash),
+                                                  onPressed: () {
+                                                    refuelRepository
+                                                        .removeRefuel(
+                                                            data[index].id);
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(const SnackBar(
+                                                            content: Text(
+                                                                "Refuel deleted."),
+                                                            backgroundColor:
+                                                                Colors.green));
+                                                    setState(() {});
+                                                  },
+                                                )
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                        Container(
-                                          height: 100,
-                                          width: 190,
-                                          padding: const EdgeInsets.only(
-                                              top: 15, left: 60),
-                                          child: Column(
-                                            children: [
-                                              Text(
-                                                data[index]
-                                                        .odometer
-                                                        .toString() +
-                                                    " km",
-                                                style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 14.0),
-                                              ),
-                                              Text(
-                                                data[index].fuel +
-                                                    "  (" +
+                                          Container(
+                                            height: 100,
+                                            width: 240,
+                                            padding: const EdgeInsets.only(
+                                                top: 15, left: 60),
+                                            child: Column(
+                                              children: [
+                                                Text(
+                                                  data[index]
+                                                          .odometer
+                                                          .toString() +
+                                                      " km",
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 14.0),
+                                                ),
+                                                Text(
+                                                  data[index].fuel +
+                                                      "  (" +
+                                                      data[index]
+                                                          .litres
+                                                          .toString() +
+                                                      "l)",
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 14.0),
+                                                ),
+                                                Text(
+                                                  data[index].price.toString() +
+                                                      "zl/l",
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 14.0),
+                                                ),
+                                                Text(
+                                                  data[index]
+                                                          .totalCost
+                                                          .toString() +
+                                                      "zl",
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 14.0),
+                                                ),
+                                                if (data.length > 1 &&
+                                                    index != 0) ...[
+                                                  Text(
+                                                    avg(data[index],
+                                                                data[index - 1])
+                                                            .toStringAsFixed(
+                                                                2) +
+                                                        "l/100km",
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 14.0),
+                                                  )
+                                                ]
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      ));
+                                }));
+                      } else {
+                        return Container(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: ListView.separated(
+                                itemCount: data!.length,
+                                separatorBuilder: (context, index) =>
+                                    const SizedBox(height: 4),
+                                itemBuilder: (BuildContext conext, int index) {
+                                  return Container(
+                                      padding: const EdgeInsets.only(
+                                          top: 10, bottom: 10),
+                                      decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: const BorderRadius.only(
+                                              topLeft: Radius.circular(10),
+                                              topRight: Radius.circular(10),
+                                              bottomLeft: Radius.circular(10),
+                                              bottomRight: Radius.circular(10)),
+                                          boxShadow: [
+                                            BoxShadow(
+                                                color: Colors.grey
+                                                    .withOpacity(0.5),
+                                                spreadRadius: 5,
+                                                blurRadius: 7,
+                                                offset: const Offset(0, 3))
+                                          ]),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            height: 115,
+                                            width: 150,
+                                            padding: const EdgeInsets.only(
+                                                top: 15, left: 15, right: 15),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  DateFormat(
+                                                          'dd-MM-yyyy\nHH:mm:ss')
+                                                      .format(data[index].date),
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 14.0),
+                                                ),
+                                                Text(
+                                                  vehicleValue,
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 14.0),
+                                                ),
+                                                IconButton(
+                                                  icon: const Icon(
+                                                      EvaIcons.trash),
+                                                  onPressed: () {
+                                                    refuelRepository
+                                                        .removeRefuel(
+                                                            data[index].id);
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(const SnackBar(
+                                                            content: Text(
+                                                                "Refuel deleted."),
+                                                            backgroundColor:
+                                                                Colors.green));
+                                                    setState(() {});
+                                                  },
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          Container(
+                                            height: 100,
+                                            width: 240,
+                                            padding: const EdgeInsets.only(
+                                                top: 15, left: 60),
+                                            child: Column(
+                                              children: [
+                                                Text(
+                                                  data[index]
+                                                          .odometer
+                                                          .toString() +
+                                                      " km",
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 14.0),
+                                                ),
+                                                Text(
+                                                  data[index].fuel +
+                                                      "  (" +
+                                                      data[index]
+                                                          .litres
+                                                          .toString() +
+                                                      "kwh)",
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 14.0),
+                                                ),
+                                                Text(
+                                                  data[index].price.toString() +
+                                                      "zl/kwh",
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 14.0),
+                                                ),
+                                                Text(
+                                                  data[index]
+                                                          .totalCost
+                                                          .toString() +
+                                                      "zl",
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 14.0),
+                                                ),
+                                                if (data.length > 1 &&
+                                                    index != 0) ...[
+                                                  Text(
                                                     data[index]
-                                                        .litres
-                                                        .toString() +
-                                                    "l)",
-                                                style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 14.0),
-                                              ),
-                                              Text(
-                                                data[index].price.toString() +
-                                                    "zl/l",
-                                                style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 14.0),
-                                              ),
-                                              Text(
-                                                data[index]
-                                                        .totalCost
-                                                        .toString() +
-                                                    "zl",
-                                                style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 14.0),
-                                              )
-                                            ],
-                                          ),
-                                        )
-                                      ],
-                                    ));
-                              }));
+                                                            .avg
+                                                            .toStringAsFixed(
+                                                                2) +
+                                                        "kwh/100km",
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 14.0),
+                                                  )
+                                                ]
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      ));
+                                }));
+                      }
                     } else if (snapshot.hasError) {
                       return Text("${snapshot.error}");
                     }
@@ -209,7 +434,17 @@ class _MainScreenState extends State<MainScreen> {
                   },
                 )),
                 floatingActionButton: FloatingActionButton.extended(
-                    onPressed: () {}, //Add Navigator
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AddRefuelScreen(
+                                    refuelRepository: refuelRepository,
+                                    carName: vehicleValue,
+                                    vehicleType: vehicleType,
+                                    lastOdometer: lastOdometer,
+                                  ))).then((_) => setState(() {}));
+                    },
                     icon: const Icon(Icons.add),
                     label: const Text('Add'),
                     backgroundColor: style.Colors.mainColor),
@@ -225,10 +460,11 @@ class _MainScreenState extends State<MainScreen> {
                       IconButton(
                           onPressed: () {
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const VehicleScreen()));
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const VehicleScreen()))
+                                .then((_) => setState(() {}));
                           },
                           icon: const Icon(EvaIcons.fileAdd)),
                       const SizedBox(width: 55),

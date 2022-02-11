@@ -6,6 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_tracker_client/dto/refuel_dto.dart';
 import 'package:flutter_tracker_client/dto/vehicle_dto.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 String mainUrl = "http://localhost:8081";
 final Dio _dio = Dio();
@@ -61,12 +62,12 @@ class UserRepository {
 }
 
 class RefuelRepository {
-  var refuelByCarName = '$mainUrl/refuel/';
+  var refuelUri = '$mainUrl/refuel';
 
   Future<List<RefuelDto>> getRefuelByCarName(String carName) async {
     var token = await storage.read(key: 'token');
 
-    final response = await http.get(Uri.parse(refuelByCarName + carName),
+    final response = await http.get(Uri.parse('$refuelUri/$carName'),
         headers: {HttpHeaders.authorizationHeader: "$token"});
 
     if (response.statusCode == 200) {
@@ -77,6 +78,46 @@ class RefuelRepository {
     } else {
       throw Exception("Error occured");
     }
+  }
+
+  Future<http.Response> addRefuel(
+      DateTime date,
+      String carName,
+      String fuel,
+      bool fullTank,
+      double litres,
+      int odometer,
+      double price,
+      double totalCost) async {
+    var token = await storage.read(key: 'token');
+
+    final response = await http.post(Uri.parse('$refuelUri/$carName'),
+        body: jsonEncode({
+          "date": DateFormat('yyyy-MM-ddTHH:mm:ss').format(date),
+          "fuel": fuel,
+          "fullTank": fullTank,
+          "litres": litres,
+          "odometer": odometer,
+          "price": price,
+          "totalCost": totalCost
+        }),
+        headers: {
+          HttpHeaders.authorizationHeader: "$token",
+          "content-type": "application/json"
+        });
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      throw Exception("Error.");
+    }
+  }
+
+  void removeRefuel(int id) async {
+    var token = await storage.read(key: 'token');
+
+    await http.delete(Uri.parse('$refuelUri/$id'),
+        headers: {HttpHeaders.authorizationHeader: "$token"});
   }
 }
 
@@ -99,27 +140,18 @@ class VehicleRepository {
     }
   }
 
-  Future<http.Response> addVehicle(
-      String brand,
-      int mileage,
-      String model,
-      String name,
-      String plateNumber,
-      String registrationYear,
-      String vehicleType,
-      String yearOfProduction) async {
+  Future<http.Response> addVehicle(String brand, String model, String name,
+      String plateNumber, String vehicleType, String yearOfProduction) async {
     var token = await storage.read(key: 'token');
 
     final response = await http.post(Uri.parse(customerVehicles),
         body: jsonEncode({
           "brand": brand,
-          "mileage": mileage,
           "model": model,
           "name": name,
           "plateNumber": plateNumber,
-          "registrationYear": 2004,
-          "vehicleType": "PETROL",
-          "yearOfProduction": 2004
+          "vehicleType": vehicleType,
+          "yearOfProduction": yearOfProduction
         }),
         headers: {
           HttpHeaders.authorizationHeader: "$token",
