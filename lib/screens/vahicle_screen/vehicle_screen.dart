@@ -23,31 +23,26 @@ class _VehicleScreenState extends State<VehicleScreen> {
         future: vehicleRepository.getCustomerVehicles(),
         builder: (context, snapshot) {
           return Scaffold(
-              endDrawer: Drawer(
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  children: [
-                    const DrawerHeader(
-                      decoration: BoxDecoration(color: style.Colors.mainColor),
-                      child: Text(""),
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.input),
-                      title: const Text("Raports"),
-                      onTap: () => {},
-                    ),
-                    ListTile(
-                      leading: const Icon(EvaIcons.logOutOutline),
-                      title: const Text("Log out"),
-                      onTap: () {
-                        BlocProvider.of<AuthenticationBloc>(context).add(
-                          LoggedOut(),
-                        );
-                      },
-                    )
-                  ],
-                ),
-              ),
+              // endDrawer: Drawer(
+              //   child: ListView(
+              //     padding: EdgeInsets.zero,
+              //     children: [
+              //       const DrawerHeader(
+              //         decoration: BoxDecoration(color: style.Colors.mainColor),
+              //         child: Text(""),
+              //       ),
+              //       ListTile(
+              //         leading: const Icon(EvaIcons.logOutOutline),
+              //         title: const Text("Log out"),
+              //         onTap: () {
+              //           BlocProvider.of<AuthenticationBloc>(context).add(
+              //             LoggedOut(),
+              //           );
+              //         },
+              //       )
+              //     ],
+              //   ),
+              // ),
               appBar: AppBar(
                   backgroundColor: style.Colors.mainColor,
                   leading: InkWell(

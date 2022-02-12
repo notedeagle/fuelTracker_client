@@ -42,7 +42,6 @@ class _MainScreenState extends State<MainScreen> {
             if (vehicleValue == "") {
               vehicleValue = cars[0].name;
             }
-            vehicleType = cars[0].vehicleType;
             return Scaffold(
                 endDrawer: Drawer(
                   child: ListView(
@@ -71,8 +70,9 @@ class _MainScreenState extends State<MainScreen> {
                           Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) =>
-                                          RaportScreen(carName: vehicleValue)))
+                                      builder: (context) => RaportScreen(
+                                          carName: vehicleValue,
+                                          vehicleType: vehicleType)))
                               .then((_) => setState(() {}))
                         }, //add route to raports
                       ),
@@ -96,6 +96,11 @@ class _MainScreenState extends State<MainScreen> {
                         DropdownButton<String>(
                             value: vehicleValue,
                             selectedItemBuilder: (_) {
+                              vehicleType = cars
+                                  .where(
+                                      (element) => element.name == vehicleValue)
+                                  .first
+                                  .vehicleType;
                               return cars
                                   .map((e) => Container(
                                         width: 50,
@@ -115,11 +120,6 @@ class _MainScreenState extends State<MainScreen> {
                             onChanged: (String? newValue) {
                               setState(() {
                                 vehicleValue = newValue!;
-                                vehicleType = cars
-                                    .where((element) =>
-                                        element.name == vehicleValue)
-                                    .first
-                                    .vehicleType;
                               });
                             },
                             items: cars.map<DropdownMenuItem<String>>(
@@ -141,7 +141,7 @@ class _MainScreenState extends State<MainScreen> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       List<RefuelDto>? data = snapshot.data;
-                      data!.sort((a, b) => a.date.compareTo(b.date));
+                      data!.sort((a, b) => b.date.compareTo(a.date));
                       if (data.length > 1) {
                         lastOdometer = data[data.length - 1].odometer;
                       }
@@ -266,10 +266,11 @@ class _MainScreenState extends State<MainScreen> {
                                                       fontSize: 14.0),
                                                 ),
                                                 if (data.length > 1 &&
-                                                    index != 0) ...[
+                                                    index !=
+                                                        data.length - 1) ...[
                                                   Text(
                                                     avg(data[index],
-                                                                data[index - 1])
+                                                                data[index + 1])
                                                             .toStringAsFixed(
                                                                 2) +
                                                         "l/100km",
@@ -289,7 +290,7 @@ class _MainScreenState extends State<MainScreen> {
                         return Container(
                             padding: const EdgeInsets.only(top: 4),
                             child: ListView.separated(
-                                itemCount: data!.length,
+                                itemCount: data.length,
                                 separatorBuilder: (context, index) =>
                                     const SizedBox(height: 4),
                                 itemBuilder: (BuildContext conext, int index) {
@@ -406,10 +407,11 @@ class _MainScreenState extends State<MainScreen> {
                                                       fontSize: 14.0),
                                                 ),
                                                 if (data.length > 1 &&
-                                                    index != 0) ...[
+                                                    index !=
+                                                        data.length - 1) ...[
                                                   Text(
-                                                    data[index]
-                                                            .avg
+                                                    avg(data[index],
+                                                                data[index + 1])
                                                             .toStringAsFixed(
                                                                 2) +
                                                         "kwh/100km",

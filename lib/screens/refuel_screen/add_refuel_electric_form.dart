@@ -53,7 +53,7 @@ class _RefuelFormState extends State<RefuelElectricForm> {
     DatePicker.showDateTimePicker(context,
         showTitleActions: true,
         minTime: DateTime(2020, 1, 1, 0, 0, 0),
-        maxTime: DateTime(2030, 12, 12, 0, 0, 0), onChanged: (date) {
+        maxTime: DateTime.now(), onChanged: (date) {
       setState(() {
         selectedDate = date;
       });
@@ -63,14 +63,10 @@ class _RefuelFormState extends State<RefuelElectricForm> {
   }
 
   totalCost() {
-    if (_litresController.text.isNotEmpty) {
-      double total = int.parse(_litresController.text) *
-          double.parse(_priceController.text);
+    double total = double.parse(_litresController.text) *
+        double.parse(_priceController.text);
 
-      return total.toStringAsFixed(2);
-    }
-
-    return "";
+    return total.toStringAsFixed(2);
   }
 
   afc(double litres, int odometer, int prevOdometer) {
@@ -100,9 +96,9 @@ class _RefuelFormState extends State<RefuelElectricForm> {
     _onAddButtonPressed() {
       double avg = 0;
       if (_formKey.currentState!.validate()) {
-        if (lastOdometer != 0) {
-          avg = afc(double.parse(_litresController.text),
-              int.parse(_odometerController.text), lastOdometer);
+        if (int.parse(_odometerController.text) != 0) {
+          avg = double.parse(afc(double.parse(_litresController.text),
+              int.parse(_odometerController.text), lastOdometer));
         }
 
         BlocProvider.of<RefuelBloc>(context).add(AddButtonPressed(
