@@ -22,7 +22,8 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
             event.name,
             event.plateNumber,
             event.vehicleType,
-            event.yearOfProduction);
+            event.yearOfProduction,
+            event.capacity);
 
         switch (response.statusCode) {
           case 200:

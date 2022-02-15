@@ -24,11 +24,11 @@ class _VehicleFormState extends State<VehicleForm> {
   _VehicleFormState(this.vehicleRepository);
 
   final _brandController = TextEditingController();
-  final _mileageController = TextEditingController();
   final _modelController = TextEditingController();
   final _nameController = TextEditingController();
   final _plateNumberController = TextEditingController();
-  final _productionYear = TextEditingController();
+  final _productionYearController = TextEditingController();
+  final _capacityController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   var _selectedValue;
@@ -44,7 +44,8 @@ class _VehicleFormState extends State<VehicleForm> {
             name: _nameController.text,
             plateNumber: _plateNumberController.text,
             vehicleType: _selectedValue,
-            yearOfProduction: _productionYear.text));
+            yearOfProduction: _productionYearController.text,
+            capacity: double.parse(_capacityController.text)));
       }
     }
 
@@ -208,7 +209,51 @@ class _VehicleFormState extends State<VehicleForm> {
                           fontSize: 14.0,
                           color: style.Colors.titleColor,
                           fontWeight: FontWeight.bold),
-                      controller: _productionYear,
+                      controller: _capacityController,
+                      keyboardType: const TextInputType.numberWithOptions(),
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
+                      ],
+                      decoration: InputDecoration(
+                        fillColor: Colors.white,
+                        prefixIcon: const Icon(
+                          EvaIcons.carOutline,
+                          color: Colors.black26,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(color: Colors.black12),
+                            borderRadius: BorderRadius.circular(30.0)),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: style.Colors.mainColor),
+                            borderRadius: BorderRadius.circular(30.0)),
+                        contentPadding:
+                            const EdgeInsets.only(left: 10.0, right: 10.0),
+                        labelText: "Tank or acumulator capacity",
+                        hintStyle: const TextStyle(
+                            fontSize: 12.0,
+                            color: style.Colors.grey,
+                            fontWeight: FontWeight.w500),
+                        labelStyle: const TextStyle(
+                            fontSize: 12.0,
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w500),
+                      ),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return "Capacity cannot be blank.";
+                        }
+                      },
+                      autocorrect: false),
+                  const SizedBox(
+                    height: 20.0,
+                  ),
+                  TextFormField(
+                      style: const TextStyle(
+                          fontSize: 14.0,
+                          color: style.Colors.titleColor,
+                          fontWeight: FontWeight.bold),
+                      controller: _productionYearController,
                       keyboardType: const TextInputType.numberWithOptions(),
                       inputFormatters: <TextInputFormatter>[
                         FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))

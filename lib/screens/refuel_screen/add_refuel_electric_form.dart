@@ -6,6 +6,9 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_tracker_client/bloc/refuel_bloc/refuel_bloc.dart';
 import 'package:flutter_tracker_client/repositories/repositories.dart';
 import 'package:flutter_tracker_client/screens/main_screen/main_screen.dart';
+import 'package:flutter_tracker_client/screens/refuel_screen/add_refual_electric_form_2.dart';
+import 'package:flutter_tracker_client/screens/refuel_screen/add_refuel_screen.dart';
+import 'package:flutter_tracker_client/screens/vahicle_screen/vehicle_screen.dart';
 import 'package:flutter_tracker_client/style/theme.dart' as style;
 import 'package:intl/intl.dart';
 
@@ -53,7 +56,7 @@ class _RefuelFormState extends State<RefuelElectricForm> {
     DatePicker.showDateTimePicker(context,
         showTitleActions: true,
         minTime: DateTime(2020, 1, 1, 0, 0, 0),
-        maxTime: DateTime(2030, 12, 12, 0, 0, 0), onChanged: (date) {
+        maxTime: DateTime.now(), onChanged: (date) {
       setState(() {
         selectedDate = date;
       });
@@ -63,14 +66,10 @@ class _RefuelFormState extends State<RefuelElectricForm> {
   }
 
   totalCost() {
-    if (_litresController.text.isNotEmpty) {
-      double total = int.parse(_litresController.text) *
-          double.parse(_priceController.text);
+    double total = double.parse(_litresController.text) *
+        double.parse(_priceController.text);
 
-      return total.toStringAsFixed(2);
-    }
-
-    return "";
+    return total.toStringAsFixed(2);
   }
 
   afc(double litres, int odometer, int prevOdometer) {
@@ -98,13 +97,7 @@ class _RefuelFormState extends State<RefuelElectricForm> {
   @override
   Widget build(BuildContext context) {
     _onAddButtonPressed() {
-      double avg = 0;
       if (_formKey.currentState!.validate()) {
-        if (lastOdometer != 0) {
-          avg = afc(double.parse(_litresController.text),
-              int.parse(_odometerController.text), lastOdometer);
-        }
-
         BlocProvider.of<RefuelBloc>(context).add(AddButtonPressed(
             date: selectedDate,
             carName: carName,
@@ -112,7 +105,6 @@ class _RefuelFormState extends State<RefuelElectricForm> {
             fullTank: fullTank,
             freeTank: freeTank,
             litres: double.parse(_litresController.text),
-            avg: avg,
             odometer: int.parse(_odometerController.text),
             price: double.parse(_priceController.text),
             totalCost: double.parse(_totalCostController.text)));
@@ -460,6 +452,62 @@ class _RefuelFormState extends State<RefuelElectricForm> {
                                     ),
                                     onPressed: _onAddButtonPressed,
                                     child: const Text("ADD",
+                                        style: TextStyle(
+                                            fontSize: 12.0,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white)))),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        SizedBox(
+                            height: 45,
+                            child: state is RefuelLoading
+                                ? Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Center(
+                                          child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: const [
+                                          SizedBox(
+                                            height: 25.0,
+                                            width: 25.0,
+                                            child: CupertinoActivityIndicator(),
+                                          )
+                                        ],
+                                      ))
+                                    ],
+                                  )
+                                : RaisedButton(
+                                    color: style.Colors.mainColor,
+                                    disabledColor: style.Colors.mainColor,
+                                    disabledTextColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30.0),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  AddRefuelScreen(
+                                                      refuelRepository:
+                                                          refuelRepository,
+                                                      carName: carName,
+                                                      vehicleType: "ELECTRIC",
+                                                      lastOdometer:
+                                                          lastOdometer,
+                                                      atHome: true)));
+                                    },
+                                    child: const Text("Charging at home",
                                         style: TextStyle(
                                             fontSize: 12.0,
                                             fontWeight: FontWeight.bold,

@@ -47,6 +47,8 @@ dependencies:
   http: ^0.13.4
   intl: ^0.17.0
   flutter_datetime_picker: ^1.5.1
+  syncfusion_flutter_charts: ^19.4.50
+  auto_size_text: ^3.0.0
 
 dev_dependencies:
   flutter_test:

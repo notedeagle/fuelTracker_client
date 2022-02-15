@@ -9,12 +9,12 @@ import 'package:flutter_tracker_client/screens/main_screen/main_screen.dart';
 import 'package:flutter_tracker_client/style/theme.dart' as style;
 import 'package:intl/intl.dart';
 
-class RefuelForm extends StatefulWidget {
+class ElectricRefuelForm2 extends StatefulWidget {
   final RefuelRepository refuelRepository;
   final String carName;
   final int lastOdometer;
 
-  const RefuelForm(
+  const ElectricRefuelForm2(
       {Key? key,
       required this.refuelRepository,
       required this.carName,
@@ -23,29 +23,25 @@ class RefuelForm extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() =>
-      _RefuelFormState(refuelRepository, carName, lastOdometer);
+      _RefuelElectric2FormState(refuelRepository, carName, lastOdometer);
 }
 
-class _RefuelFormState extends State<RefuelForm> {
+class _RefuelElectric2FormState extends State<ElectricRefuelForm2> {
   final RefuelRepository refuelRepository;
   final String carName;
   final int lastOdometer;
 
-  _RefuelFormState(this.refuelRepository, this.carName, this.lastOdometer);
-
-  final _dateController = TextEditingController();
-  bool fullTank = false;
-  final _litresController = TextEditingController();
-  final _odometerController = TextEditingController();
-  final _priceController = TextEditingController();
-  final _totalCostController = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
+  _RefuelElectric2FormState(
+      this.refuelRepository, this.carName, this.lastOdometer);
 
   final _formKey = GlobalKey<FormState>();
   DateTime selectedDate = DateTime.now();
 
-  var _selectedValue;
-  final _categories = ["DIESEL", "GASOLINE", "LPG"];
+  final _dateController = TextEditingController();
+  final _odometerController = TextEditingController();
+  final _priceController = TextEditingController();
+  RangeValues _currentRangeValues = const RangeValues(20, 100);
+  bool fullTank = false;
 
   Future _selectDate() async {
     DatePicker.showDateTimePicker(context,
@@ -60,49 +56,18 @@ class _RefuelFormState extends State<RefuelForm> {
     });
   }
 
-  totalCost() {
-    double total = double.parse(_litresController.text) *
-        double.parse(_priceController.text);
-
-    return total.toStringAsFixed(2);
-  }
-
-  afc(double litres, int odometer, int prevOdometer) {
-    double afc = litres / (odometer - prevOdometer) * 100;
-
-    return afc.toStringAsFixed(2);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _focusNode.addListener(() {
-      if (_focusNode.hasFocus) {
-        _totalCostController.text = totalCost();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _focusNode.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     _onAddButtonPressed() {
       if (_formKey.currentState!.validate()) {
-        BlocProvider.of<RefuelBloc>(context).add(AddButtonPressed(
+        BlocProvider.of<RefuelBloc>(context).add(AddElectricButtonPressed(
             date: selectedDate,
             carName: carName,
-            fuel: _selectedValue,
             fullTank: fullTank,
-            freeTank: false,
-            litres: double.parse(_litresController.text),
+            startLevel: _currentRangeValues.start,
+            endLevel: _currentRangeValues.end,
             odometer: int.parse(_odometerController.text),
-            price: double.parse(_priceController.text),
-            totalCost: double.parse(_totalCostController.text)));
+            price: double.parse(_priceController.text)));
       }
     }
 
@@ -190,52 +155,6 @@ class _RefuelFormState extends State<RefuelForm> {
                   const SizedBox(
                     height: 20.0,
                   ),
-                  DropdownButtonFormField(
-                      decoration: InputDecoration(
-                        fillColor: Colors.white,
-                        prefixIcon: const Icon(
-                          EvaIcons.carOutline,
-                          color: Colors.black26,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: Colors.black12),
-                            borderRadius: BorderRadius.circular(30.0)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                const BorderSide(color: style.Colors.mainColor),
-                            borderRadius: BorderRadius.circular(30.0)),
-                        contentPadding:
-                            const EdgeInsets.only(left: 10.0, right: 10.0),
-                        labelText: "Fuel type",
-                        hintStyle: const TextStyle(
-                            fontSize: 12.0,
-                            color: style.Colors.grey,
-                            fontWeight: FontWeight.w500),
-                        labelStyle: const TextStyle(
-                            fontSize: 12.0,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w500),
-                      ),
-                      items: _categories.map((String dropDownStringItem) {
-                        return DropdownMenuItem<String>(
-                            value: dropDownStringItem,
-                            child: Text(dropDownStringItem));
-                      }).toList(),
-                      value: _selectedValue,
-                      hint: const Text("Fuel type"),
-                      validator: (value) {
-                        if (value == null) {
-                          return "Fuel type cannot be blank.";
-                        }
-                      },
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedValue = value;
-                        });
-                      }),
-                  const SizedBox(
-                    height: 20.0,
-                  ),
                   TextFormField(
                       style: const TextStyle(
                           fontSize: 14.0,
@@ -274,45 +193,6 @@ class _RefuelFormState extends State<RefuelForm> {
                         }
                       },
                       autocorrect: false),
-                  const SizedBox(
-                    height: 20.0,
-                  ),
-                  TextFormField(
-                    style: const TextStyle(
-                        fontSize: 14.0,
-                        color: style.Colors.titleColor,
-                        fontWeight: FontWeight.bold),
-                    controller: _litresController,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(
-                      fillColor: Colors.white,
-                      prefixIcon: const Icon(
-                        EvaIcons.carOutline,
-                        color: Colors.black26,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Colors.black12),
-                          borderRadius: BorderRadius.circular(30.0)),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(color: style.Colors.mainColor),
-                          borderRadius: BorderRadius.circular(30.0)),
-                      contentPadding:
-                          const EdgeInsets.only(left: 10.0, right: 10.0),
-                      labelText: "Litres",
-                      hintStyle: const TextStyle(
-                          fontSize: 12.0,
-                          color: style.Colors.grey,
-                          fontWeight: FontWeight.w500),
-                      labelStyle: const TextStyle(
-                          fontSize: 12.0,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    validator: (value) =>
-                        value!.isEmpty ? "Litres name cannot be blank." : null,
-                    autocorrect: false,
-                  ),
                   const SizedBox(
                     height: 20.0,
                   ),
@@ -356,44 +236,38 @@ class _RefuelFormState extends State<RefuelForm> {
                   const SizedBox(
                     height: 20.0,
                   ),
-                  TextFormField(
-                      style: const TextStyle(
-                          fontSize: 14.0,
-                          color: style.Colors.titleColor,
-                          fontWeight: FontWeight.bold),
-                      controller: _totalCostController,
-                      focusNode: _focusNode,
-                      decoration: InputDecoration(
-                        fillColor: Colors.white,
-                        prefixIcon: const Icon(
-                          EvaIcons.carOutline,
-                          color: Colors.black26,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: Colors.black12),
-                            borderRadius: BorderRadius.circular(30.0)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                const BorderSide(color: style.Colors.mainColor),
-                            borderRadius: BorderRadius.circular(30.0)),
-                        contentPadding:
-                            const EdgeInsets.only(left: 10.0, right: 10.0),
-                        labelText: "Total cost",
-                        hintStyle: const TextStyle(
-                            fontSize: 12.0,
-                            color: style.Colors.grey,
-                            fontWeight: FontWeight.w500),
-                        labelStyle: const TextStyle(
-                            fontSize: 12.0,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w500),
-                      ),
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "Total cost cannot be blank.";
-                        }
-                      },
-                      autocorrect: false),
+                  Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(color: style.Colors.grey),
+                          borderRadius: BorderRadius.circular(30.0)),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const SizedBox(
+                              height: 10.0,
+                            ),
+                            const Text(
+                              "Starting and target charge level",
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            RangeSlider(
+                              values: _currentRangeValues,
+                              max: 100,
+                              divisions: 100,
+                              activeColor: style.Colors.mainColor,
+                              labels: RangeLabels(
+                                  _currentRangeValues.start.round().toString(),
+                                  _currentRangeValues.end.round().toString()),
+                              onChanged: (RangeValues value) {
+                                setState(() {
+                                  _currentRangeValues = value;
+                                });
+                              },
+                            )
+                          ])),
                   const SizedBox(
                     height: 20.0,
                   ),
@@ -463,7 +337,7 @@ class _RefuelFormState extends State<RefuelForm> {
                                             color: Colors.white)))),
                       ],
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
