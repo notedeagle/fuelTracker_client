@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tracker_client/bloc/refuel_bloc/refuel_bloc.dart';
 import 'package:flutter_tracker_client/repositories/repositories.dart';
+import 'package:flutter_tracker_client/screens/refuel_screen/add_refual_electric_form_2.dart';
 import 'package:flutter_tracker_client/screens/refuel_screen/add_refuel_electric_form.dart';
 import 'package:flutter_tracker_client/screens/refuel_screen/add_refuel_form.dart';
 
@@ -10,18 +11,20 @@ class AddRefuelScreen extends StatelessWidget {
   final String carName;
   final String vehicleType;
   final int lastOdometer;
+  final bool atHome;
 
   const AddRefuelScreen(
       {Key? key,
       required this.refuelRepository,
       required this.carName,
       required this.vehicleType,
-      required this.lastOdometer})
+      required this.lastOdometer,
+      required this.atHome})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    if (vehicleType == "PETROL") {
+    if (vehicleType == "PETROL" && atHome == false) {
       return Scaffold(
         body: BlocProvider(
             create: (context) {
@@ -32,6 +35,17 @@ class AddRefuelScreen extends StatelessWidget {
                 carName: carName,
                 lastOdometer: lastOdometer)),
       );
+    } else if (vehicleType == "ELECTRIC" && atHome == true) {
+      return Scaffold(
+          body: BlocProvider(
+        create: (conext) {
+          return RefuelBloc(refuelRepository: refuelRepository);
+        },
+        child: ElectricRefuelForm2(
+            refuelRepository: refuelRepository,
+            carName: carName,
+            lastOdometer: lastOdometer),
+      ));
     } else {
       return Scaffold(
         body: BlocProvider(

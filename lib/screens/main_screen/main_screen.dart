@@ -441,11 +441,11 @@ class _MainScreenState extends State<MainScreen> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => AddRefuelScreen(
-                                    refuelRepository: refuelRepository,
-                                    carName: vehicleValue,
-                                    vehicleType: vehicleType,
-                                    lastOdometer: lastOdometer,
-                                  ))).then((_) => setState(() {}));
+                                  refuelRepository: refuelRepository,
+                                  carName: vehicleValue,
+                                  vehicleType: vehicleType,
+                                  lastOdometer: lastOdometer,
+                                  atHome: false))).then((_) => setState(() {}));
                     },
                     icon: const Icon(Icons.add),
                     label: const Text('Add'),

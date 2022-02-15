@@ -16,7 +16,7 @@ class RefuelBloc extends Bloc<RefuelEvent, RefuelState> {
       yield RefuelLoading();
 
       try {
-        var response = await refuelRepository.addRefuel(
+        await refuelRepository.addRefuel(
             event.date,
             event.carName,
             event.fuel,
@@ -26,11 +26,24 @@ class RefuelBloc extends Bloc<RefuelEvent, RefuelState> {
             event.price,
             event.totalCost);
 
-        switch (response.statusCode) {
-          case 200:
-            yield RefuelInitial();
-            break;
-        }
+        yield RefuelInitial();
+      } catch (error) {
+        yield RefuelFailure(error: error.toString());
+      }
+    } else if (event is AddElectricButtonPressed) {
+      yield RefuelLoading();
+
+      try {
+        await refuelRepository.addElectricRefuel(
+            event.date,
+            event.carName,
+            event.fullTank,
+            event.startLevel,
+            event.endLevel,
+            event.odometer,
+            event.price);
+
+        yield RefuelInitial();
       } catch (error) {
         yield RefuelFailure(error: error.toString());
       }

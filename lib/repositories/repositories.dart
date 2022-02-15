@@ -113,6 +113,37 @@ class RefuelRepository {
     }
   }
 
+  Future<http.Response> addElectricRefuel(
+      DateTime date,
+      String carName,
+      bool fullTank,
+      double startLvl,
+      double endLvl,
+      int odometer,
+      double price) async {
+    var token = await storage.read(key: 'token');
+
+    final response = await http.post(Uri.parse('$refuelUri/electric/$carName'),
+        body: jsonEncode({
+          "date": DateFormat('yyyy-MM-ddTHH:mm:ss').format(date),
+          "fullTank": fullTank,
+          "startLvl": startLvl,
+          "endLvl": endLvl,
+          "odometer": odometer,
+          "price": price,
+        }),
+        headers: {
+          HttpHeaders.authorizationHeader: "$token",
+          "content-type": "application/json"
+        });
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      throw Exception("Error.");
+    }
+  }
+
   void removeRefuel(int id) async {
     var token = await storage.read(key: 'token');
 
@@ -140,8 +171,14 @@ class VehicleRepository {
     }
   }
 
-  Future<http.Response> addVehicle(String brand, String model, String name,
-      String plateNumber, String vehicleType, String yearOfProduction) async {
+  Future<http.Response> addVehicle(
+      String brand,
+      String model,
+      String name,
+      String plateNumber,
+      String vehicleType,
+      String yearOfProduction,
+      double capacity) async {
     var token = await storage.read(key: 'token');
 
     final response = await http.post(Uri.parse(customerVehicles),
@@ -151,7 +188,8 @@ class VehicleRepository {
           "name": name,
           "plateNumber": plateNumber,
           "vehicleType": vehicleType,
-          "yearOfProduction": yearOfProduction
+          "yearOfProduction": yearOfProduction,
+          "capacity": capacity
         }),
         headers: {
           HttpHeaders.authorizationHeader: "$token",
