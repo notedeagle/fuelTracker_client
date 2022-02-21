@@ -68,6 +68,9 @@ class _RefuelElectric2FormState extends State<ElectricRefuelForm2> {
             endLevel: _currentRangeValues.end,
             odometer: int.parse(_odometerController.text),
             price: double.parse(_priceController.text)));
+
+        // Navigator.pop(
+        //     context, MaterialPageRoute(builder: (context) => MainScreen()));
       }
     }
 
@@ -81,7 +84,7 @@ class _RefuelElectric2FormState extends State<ElectricRefuelForm2> {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               content: Text("Refuel added."), backgroundColor: Colors.green));
 
-          Navigator.pop(context,
+          Navigator.push(context,
               MaterialPageRoute(builder: (context) => const MainScreen()));
         }
       },
@@ -247,7 +250,7 @@ class _RefuelElectric2FormState extends State<ElectricRefuelForm2> {
                               height: 10.0,
                             ),
                             const Text(
-                              "Starting and target charge level",
+                              "Start and end battery level",
                               style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey,

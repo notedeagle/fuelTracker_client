@@ -310,7 +310,7 @@ class _RefuelFormState extends State<RefuelForm> {
                           fontWeight: FontWeight.w500),
                     ),
                     validator: (value) =>
-                        value!.isEmpty ? "Litres name cannot be blank." : null,
+                        value!.isEmpty ? "Litres cannot be blank." : null,
                     autocorrect: false,
                   ),
                   const SizedBox(
@@ -416,10 +416,7 @@ class _RefuelFormState extends State<RefuelForm> {
                             })),
                   ),
                   const SizedBox(
-                    height: 30.0,
-                  ),
-                  const SizedBox(
-                    height: 20.0,
+                    height: 50.0,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 30.0, bottom: 10.0),

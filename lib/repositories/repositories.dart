@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_tracker_client/dto/expense_dto.dart';
 import 'package:flutter_tracker_client/dto/refuel_dto.dart';
 import 'package:flutter_tracker_client/dto/vehicle_dto.dart';
 import 'package:http/http.dart' as http;
@@ -209,6 +210,56 @@ class VehicleRepository {
     var token = await storage.read(key: 'token');
 
     await http.delete(Uri.parse('$customerVehicles/$name'),
+        headers: {HttpHeaders.authorizationHeader: "$token"});
+  }
+}
+
+class ExpenseRepository {
+  var expenseUri = '$mainUrl/expense';
+
+  Future<List<ExpenseDto>> getExpenseByCarName(String carName) async {
+    var token = await storage.read(key: 'token');
+
+    final response = await http.get(Uri.parse('$expenseUri/$carName'),
+        headers: {HttpHeaders.authorizationHeader: "$token"});
+
+    if (response.statusCode == 200) {
+      List jsonResponse = jsonDecode(response.body);
+      return jsonResponse.map((data) => ExpenseDto.fromJson(data)).toList();
+    } else if (response.statusCode == 204) {
+      return List.empty();
+    } else {
+      throw Exception("Error occured");
+    }
+  }
+
+  Future<http.Response> addExpense(String carName, DateTime date, int odometer,
+      double totalCost, String note) async {
+    var token = await storage.read(key: 'token');
+
+    final response = await http.post(Uri.parse('$expenseUri/$carName'),
+        body: jsonEncode({
+          "date": DateFormat('yyyy-MM-ddTHH:mm:ss').format(date),
+          "odometer": odometer,
+          "totalCost": totalCost,
+          "note": note
+        }),
+        headers: {
+          HttpHeaders.authorizationHeader: "$token",
+          "content-type": "application/json"
+        });
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      throw Exception("Error.");
+    }
+  }
+
+  void removeExpense(int id) async {
+    var token = await storage.read(key: 'token');
+
+    await http.delete(Uri.parse('$expenseUri/$id'),
         headers: {HttpHeaders.authorizationHeader: "$token"});
   }
 }
