@@ -529,6 +529,7 @@ class _MainScreenState extends State<MainScreen> {
                 )),
                 floatingActionButton: ExpandableFab(distance: 125, children: [
                   FloatingActionButton.extended(
+                      heroTag: "btn1",
                       onPressed: () {
                         Navigator.push(
                                 context,
@@ -545,6 +546,7 @@ class _MainScreenState extends State<MainScreen> {
                       label: const Text('Add refuel'),
                       backgroundColor: style.Colors.mainColor),
                   FloatingActionButton.extended(
+                      heroTag: "btn2",
                       onPressed: () {
                         Navigator.push(
                                 context,

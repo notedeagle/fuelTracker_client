@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_tracker_client/dto/expense_dto.dart';
 import 'package:flutter_tracker_client/dto/refuel_dto.dart';
+import 'package:flutter_tracker_client/dto/reports_dto.dart';
 import 'package:flutter_tracker_client/dto/vehicle_dto.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -261,5 +262,23 @@ class ExpenseRepository {
 
     await http.delete(Uri.parse('$expenseUri/$id'),
         headers: {HttpHeaders.authorizationHeader: "$token"});
+  }
+}
+
+class ReportRepository {
+  var reportUri = '$mainUrl/totalCost';
+
+  Future<ReportsDto> getReportsByCarName(String carName) async {
+    var token = await storage.read(key: 'token');
+
+    final response = await http.get(Uri.parse('$reportUri/$carName'),
+        headers: {HttpHeaders.authorizationHeader: "$token"});
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+      return ReportsDto.fromJson(jsonResponse);
+    } else {
+      throw Exception("Error occured");
+    }
   }
 }

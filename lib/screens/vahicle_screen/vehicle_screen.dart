@@ -1,7 +1,5 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_tracker_client/bloc/auth_bloc/auth.dart';
 import 'package:flutter_tracker_client/dto/vehicle_dto.dart';
 import 'package:flutter_tracker_client/repositories/repositories.dart';
 import 'package:flutter_tracker_client/screens/vahicle_screen/add_vehicle_screen.dart';
@@ -23,26 +21,6 @@ class _VehicleScreenState extends State<VehicleScreen> {
         future: vehicleRepository.getCustomerVehicles(),
         builder: (context, snapshot) {
           return Scaffold(
-              // endDrawer: Drawer(
-              //   child: ListView(
-              //     padding: EdgeInsets.zero,
-              //     children: [
-              //       const DrawerHeader(
-              //         decoration: BoxDecoration(color: style.Colors.mainColor),
-              //         child: Text(""),
-              //       ),
-              //       ListTile(
-              //         leading: const Icon(EvaIcons.logOutOutline),
-              //         title: const Text("Log out"),
-              //         onTap: () {
-              //           BlocProvider.of<AuthenticationBloc>(context).add(
-              //             LoggedOut(),
-              //           );
-              //         },
-              //       )
-              //     ],
-              //   ),
-              // ),
               appBar: AppBar(
                   backgroundColor: style.Colors.mainColor,
                   leading: InkWell(
@@ -155,13 +133,13 @@ class _VehicleScreenState extends State<VehicleScreen> {
                                               onPressed: () {
                                                 vehicleRepository.removeVehicle(
                                                     data[index].name);
+                                                setState(() {});
                                                 ScaffoldMessenger.of(context)
                                                     .showSnackBar(const SnackBar(
                                                         content: Text(
                                                             "Vehicle deleted."),
                                                         backgroundColor:
                                                             Colors.green));
-                                                setState(() {});
                                               },
                                             )
                                           ],
