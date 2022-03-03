@@ -68,7 +68,7 @@ class _MainScreenState extends State<MainScreen> {
                           }),
                       ListTile(
                         leading: const Icon(Icons.input),
-                        title: const Text("Raports"),
+                        title: const Text("Reports"),
                         onTap: () => {
                           Navigator.push(
                                   context,

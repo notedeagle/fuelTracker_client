@@ -140,6 +140,7 @@ class _VehicleScreenState extends State<VehicleScreen> {
                                                             "Vehicle deleted."),
                                                         backgroundColor:
                                                             Colors.green));
+                                                Navigator.pop(context);
                                               },
                                             )
                                           ],

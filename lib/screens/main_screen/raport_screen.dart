@@ -397,6 +397,9 @@ class _RaportScreenState extends State<RaportScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       children: [
+                                        const SizedBox(
+                                          width: 50,
+                                        ),
                                         FittedBox(
                                           fit: BoxFit.fitWidth,
                                           child: Column(
@@ -489,7 +492,11 @@ class _RaportScreenState extends State<RaportScreen> {
                                   primaryXAxis: CategoryAxis(),
                                   series: <ChartSeries>[
                                     ColumnSeries<CostPerMonth, String>(
-                                        dataSource: data.costPerMonth,
+                                        dataSource:
+                                            data.costPerMonth.reversed.toList(),
+                                        dataLabelSettings:
+                                            const DataLabelSettings(
+                                                isVisible: true),
                                         xValueMapper: (CostPerMonth view, _) =>
                                             DateFormat.MMMM().format(
                                                 DateTime(0, view.monthNumber)),
@@ -982,8 +989,12 @@ class _RaportScreenState extends State<RaportScreen> {
                                             series: <ChartSeries>[
                                               ColumnSeries<CostPerMonth,
                                                       String>(
-                                                  dataSource:
-                                                      data!.costPerMonth,
+                                                  dataSource: data!
+                                                      .costPerMonth.reversed
+                                                      .toList(),
+                                                  dataLabelSettings:
+                                                      const DataLabelSettings(
+                                                          isVisible: true),
                                                   xValueMapper: (CostPerMonth
                                                               view,
                                                           _) =>
@@ -1036,10 +1047,17 @@ class _RaportScreenState extends State<RaportScreen> {
                                       primaryXAxis: CategoryAxis(),
                                       primaryYAxis: NumericAxis(
                                           numberFormat: NumberFormat("###.00"),
-                                          interval: 0.1),
+                                          rangePadding:
+                                              ChartRangePadding.additional),
                                       series: <ChartSeries>[
                                         LineSeries<RefuelDto, String>(
                                             dataSource: data,
+                                            dataLabelSettings:
+                                                const DataLabelSettings(
+                                                    isVisible: true),
+                                            markerSettings:
+                                                const MarkerSettings(
+                                                    isVisible: true),
                                             xValueMapper:
                                                 (RefuelDto refuel, _) =>
                                                     DateFormat('dd-MM')
@@ -1047,6 +1065,62 @@ class _RaportScreenState extends State<RaportScreen> {
                                             yValueMapper:
                                                 (RefuelDto refuel, _) =>
                                                     refuel.price)
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: const BorderRadius.only(
+                                            topLeft: Radius.circular(10),
+                                            topRight: Radius.circular(10),
+                                            bottomLeft: Radius.circular(10),
+                                            bottomRight: Radius.circular(10)),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color:
+                                                  Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 5,
+                                              blurRadius: 7,
+                                              offset: const Offset(0, 3))
+                                        ]),
+                                    height: 240,
+                                    // width: 390,
+                                    padding: const EdgeInsets.only(
+                                        top: 15, left: 15, right: 15),
+                                    child: SfCartesianChart(
+                                      title: ChartTitle(
+                                          text: "Avg fuel consumption",
+                                          textStyle: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14.0)),
+                                      primaryXAxis: CategoryAxis(),
+                                      primaryYAxis: NumericAxis(
+                                          numberFormat: NumberFormat("###.00"),
+                                          rangePadding:
+                                              ChartRangePadding.additional),
+                                      series: <ChartSeries>[
+                                        LineSeries<RefuelDto, String>(
+                                            dataSource: data
+                                                .where(
+                                                    (x) => data.indexOf(x) != 0)
+                                                .toList(),
+                                            dataLabelSettings:
+                                                const DataLabelSettings(
+                                                    isVisible: true),
+                                            markerSettings:
+                                                const MarkerSettings(
+                                                    isVisible: true),
+                                            xValueMapper:
+                                                (RefuelDto refuel, _) =>
+                                                    DateFormat('dd-MM')
+                                                        .format(refuel.date),
+                                            yValueMapper:
+                                                (RefuelDto refuel, _) =>
+                                                    refuel.avg),
                                       ],
                                     ),
                                   ),
