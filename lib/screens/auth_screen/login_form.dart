@@ -19,7 +19,7 @@ class LoginForm extends StatefulWidget {
 class _LoginFormState extends State<LoginForm> {
   final UserRepository userRepository;
   _LoginFormState(this.userRepository);
-  final _emailController = TextEditingController();
+  final _loginController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   final regEmail = RegExp(
@@ -30,7 +30,7 @@ class _LoginFormState extends State<LoginForm> {
     _onLoginButtonPressed() {
       if (_formKey.currentState!.validate()) {
         BlocProvider.of<LoginBloc>(context).add(LoginButtonPressed(
-            email: _emailController.text, password: _passwordController.text));
+            login: _loginController.text, password: _passwordController.text));
       }
     }
 
@@ -78,7 +78,7 @@ class _LoginFormState extends State<LoginForm> {
                         fontSize: 14.0,
                         color: style.Colors.titleColor,
                         fontWeight: FontWeight.bold),
-                    controller: _emailController,
+                    controller: _loginController,
                     keyboardType: TextInputType.name,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(EvaIcons.emailOutline,
@@ -92,7 +92,7 @@ class _LoginFormState extends State<LoginForm> {
                           borderRadius: BorderRadius.circular(30.0)),
                       contentPadding:
                           const EdgeInsets.only(left: 10.0, right: 10.0),
-                      labelText: "Email address",
+                      labelText: "Login",
                       hintStyle: const TextStyle(
                           fontSize: 12.0,
                           color: style.Colors.grey,
@@ -104,9 +104,7 @@ class _LoginFormState extends State<LoginForm> {
                     ),
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "Email cannot be blank.";
-                      } else if (!regEmail.hasMatch(value)) {
-                        return "Incorrect email";
+                        return "Login cannot be blank.";
                       }
                     },
                     autocorrect: false,
@@ -190,13 +188,13 @@ class _LoginFormState extends State<LoginForm> {
                                       ))
                                     ],
                                   )
-                                : RaisedButton(
-                                    color: style.Colors.mainColor,
-                                    disabledColor: style.Colors.mainColor,
-                                    disabledTextColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30.0),
-                                    ),
+                                : ElevatedButton(
+                                    // color: style.Colors.mainColor,
+                                    // disabledColor: style.Colors.mainColor,
+                                    // disabledTextColor: Colors.white,
+                                    // shape: RoundedRectangleBorder(
+                                    //   borderRadius: BorderRadius.circular(30.0),
+                                    // ),
                                     onPressed: _onLoginButtonPressed,
                                     child: const Text("LOG IN",
                                         style: TextStyle(
