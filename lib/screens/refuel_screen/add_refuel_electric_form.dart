@@ -8,6 +8,7 @@ import 'package:flutter_tracker_client/repositories/repositories.dart';
 import 'package:flutter_tracker_client/screens/main_screen/main_screen.dart';
 import 'package:flutter_tracker_client/screens/refuel_screen/add_refuel_screen.dart';
 import 'package:flutter_tracker_client/style/theme.dart' as style;
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 
 class RefuelElectricForm extends StatefulWidget {
@@ -46,6 +47,7 @@ class _RefuelFormState extends State<RefuelElectricForm> {
 
   final _formKey = GlobalKey<FormState>();
   DateTime selectedDate = DateTime.now();
+  late Position currentLocation;
 
   var _selectedValue;
   final _categories = ["DIESEL", "GASOLINE", "LPG"];
@@ -74,6 +76,23 @@ class _RefuelFormState extends State<RefuelElectricForm> {
     double afc = litres / (odometer - prevOdometer) * 100;
 
     return afc.toStringAsFixed(2);
+  }
+
+  void getCurrentLocation() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('Location denied forever');
+    }
+
+    currentLocation = await Geolocator.getCurrentPosition();
   }
 
   @override
@@ -105,7 +124,9 @@ class _RefuelFormState extends State<RefuelElectricForm> {
             litres: double.parse(_litresController.text),
             odometer: int.parse(_odometerController.text),
             price: double.parse(_priceController.text),
-            totalCost: double.parse(_totalCostController.text)));
+            totalCost: double.parse(_totalCostController.text),
+            latitude: currentLocation.latitude,
+            longitude: currentLocation.longitude));
       }
     }
 
@@ -497,13 +518,15 @@ class _RefuelFormState extends State<RefuelElectricForm> {
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   AddRefuelScreen(
-                                                      refuelRepository:
-                                                          refuelRepository,
-                                                      carName: carName,
-                                                      vehicleType: "ELECTRIC",
-                                                      lastOdometer:
-                                                          lastOdometer,
-                                                      atHome: true)));
+                                                    refuelRepository:
+                                                        refuelRepository,
+                                                    carName: carName,
+                                                    vehicleType: "ELECTRIC",
+                                                    lastOdometer: lastOdometer,
+                                                    atHome: true,
+                                                    latidiude: 0,
+                                                    longtitiude: 0,
+                                                  )));
                                     },
                                     child: const Text("Charging at home",
                                         style: TextStyle(

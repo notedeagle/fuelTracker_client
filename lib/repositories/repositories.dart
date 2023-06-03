@@ -94,7 +94,9 @@ class RefuelRepository {
       double litres,
       int odometer,
       double price,
-      double totalCost) async {
+      double totalCost,
+      double latidute,
+      double longitude) async {
     var token = await storage.read(key: 'token');
 
     final response = await http.post(Uri.parse('$refuelUri/$carName'),
@@ -105,7 +107,9 @@ class RefuelRepository {
           "litres": litres,
           "odometer": odometer,
           "price": price,
-          "totalCost": totalCost
+          "totalCost": totalCost,
+          "latitude": latidute,
+          "longitude": longitude
         }),
         headers: {
           HttpHeaders.authorizationHeader: "$token",

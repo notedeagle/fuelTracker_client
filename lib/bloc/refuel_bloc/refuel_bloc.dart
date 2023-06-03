@@ -24,7 +24,9 @@ class RefuelBloc extends Bloc<RefuelEvent, RefuelState> {
             event.litres,
             event.odometer,
             event.price,
-            event.totalCost);
+            event.totalCost,
+            event.latitude,
+            event.longitude);
 
         yield RefuelInitial();
       } catch (error) {
