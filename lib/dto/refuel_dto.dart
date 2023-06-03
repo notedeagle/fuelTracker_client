@@ -8,6 +8,8 @@ class RefuelDto {
   int odometer;
   double price;
   double totalCost;
+  double latitide;
+  double longitude;
 
   RefuelDto(
       {required this.id,
@@ -18,7 +20,9 @@ class RefuelDto {
       required this.avg,
       required this.odometer,
       required this.totalCost,
-      required this.price});
+      required this.price,
+      required this.latitide,
+      required this.longitude});
 
   factory RefuelDto.fromJson(Map<String, dynamic> json) {
     return RefuelDto(
@@ -30,7 +34,9 @@ class RefuelDto {
         avg: 0,
         odometer: json['odometer'] as int,
         totalCost: json['totalCost'] as double,
-        price: json['price'] as double);
+        price: json['price'] as double,
+        latitide: json['latitude'] as double,
+        longitude: json['longitude'] as double);
   }
 
   setAvg(double avg) {

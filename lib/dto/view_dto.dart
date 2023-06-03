@@ -11,6 +11,8 @@ class ViewDto {
   String totalCost;
   String note;
   String type;
+  double latitude;
+  double longitude;
 
   ViewDto(
       {required this.id,
@@ -21,7 +23,9 @@ class ViewDto {
       required this.price,
       required this.totalCost,
       required this.note,
-      required this.type});
+      required this.type,
+      required this.latitude,
+      required this.longitude});
 
   factory ViewDto.fromRefuel(RefuelDto refuelDto) {
     return ViewDto(
@@ -33,7 +37,9 @@ class ViewDto {
         price: refuelDto.price.toStringAsFixed(2),
         totalCost: refuelDto.totalCost.toStringAsFixed(2) + "zl",
         note: "",
-        type: "REFUEL");
+        type: "REFUEL",
+        latitude: refuelDto.latitide,
+        longitude: refuelDto.longitude);
   }
 
   factory ViewDto.fromExpense(ExpenseDto expenseDto) {
@@ -46,6 +52,8 @@ class ViewDto {
         price: "",
         totalCost: expenseDto.totalCost.toStringAsFixed(2) + "zl",
         note: expenseDto.note,
-        type: "EXPENSE");
+        type: "EXPENSE",
+        latitude: 0,
+        longitude: 0);
   }
 }

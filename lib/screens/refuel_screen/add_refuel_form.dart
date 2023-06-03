@@ -7,7 +7,9 @@ import 'package:flutter_tracker_client/bloc/refuel_bloc/refuel_bloc.dart';
 import 'package:flutter_tracker_client/repositories/repositories.dart';
 import 'package:flutter_tracker_client/screens/main_screen/main_screen.dart';
 import 'package:flutter_tracker_client/style/theme.dart' as style;
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+import 'package:location/location.dart';
 
 class RefuelForm extends StatefulWidget {
   final RefuelRepository refuelRepository;
@@ -44,6 +46,15 @@ class _RefuelFormState extends State<RefuelForm> {
   final _formKey = GlobalKey<FormState>();
   DateTime selectedDate = DateTime.now();
 
+  Position currentLocation = Position(
+      longitude: 0,
+      latitude: 0,
+      timestamp: null,
+      accuracy: 0,
+      altitude: 0,
+      heading: 0,
+      speed: 0,
+      speedAccuracy: 0);
   var _selectedValue;
   final _categories = ["DIESEL", "GASOLINE", "LPG"];
 
@@ -73,8 +84,26 @@ class _RefuelFormState extends State<RefuelForm> {
     return afc.toStringAsFixed(2);
   }
 
+  Future getCurrentLocation() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('Location denied forever');
+    }
+
+    currentLocation = await Geolocator.getCurrentPosition();
+  }
+
   @override
   void initState() {
+    getCurrentLocation();
     super.initState();
     _focusNode.addListener(() {
       if (_focusNode.hasFocus) {
@@ -102,7 +131,9 @@ class _RefuelFormState extends State<RefuelForm> {
             litres: double.parse(_litresController.text),
             odometer: int.parse(_odometerController.text),
             price: double.parse(_priceController.text),
-            totalCost: double.parse(_totalCostController.text)));
+            totalCost: double.parse(_totalCostController.text),
+            latitude: currentLocation.latitude,
+            longitude: currentLocation.longitude));
       }
     }
 

@@ -14,6 +14,8 @@ class AddButtonPressed extends RefuelEvent {
   final int odometer;
   final double price;
   final double totalCost;
+  final double latitude;
+  final double longitude;
 
   const AddButtonPressed(
       {required this.date,
@@ -24,11 +26,13 @@ class AddButtonPressed extends RefuelEvent {
       required this.litres,
       required this.odometer,
       required this.price,
-      required this.totalCost});
+      required this.totalCost,
+      required this.latitude,
+      required this.longitude});
 
   @override
   List<Object> get props =>
-      [fuel, fullTank, litres, odometer, price, totalCost];
+      [fuel, fullTank, litres, odometer, price, totalCost, latitude, longitude];
 }
 
 class AddElectricButtonPressed extends RefuelEvent {

@@ -14,6 +14,8 @@ import 'package:flutter_tracker_client/screens/vahicle_screen/vehicle_screen.dar
 import 'package:intl/intl.dart';
 import 'package:flutter_tracker_client/style/theme.dart' as style;
 
+import '../refuel_screen/refuel_map_form.dart';
+
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
 
@@ -28,6 +30,8 @@ class _MainScreenState extends State<MainScreen> {
   String vehicleValue = "";
   String vehicleType = "";
   int lastOdometer = 0;
+  double latidude = 0;
+  double longtitude = 0;
 
   avg(ViewDto data, ViewDto data2) {
     final km = data.odometer - data2.odometer;
@@ -156,369 +160,409 @@ class _MainScreenState extends State<MainScreen> {
                                 separatorBuilder: (context, index) =>
                                     const SizedBox(height: 4),
                                 itemBuilder: (BuildContext conext, int index) {
-                                  return Container(
-                                      padding: const EdgeInsets.only(
-                                          top: 10, bottom: 10),
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: const BorderRadius.only(
-                                              topLeft: Radius.circular(10),
-                                              topRight: Radius.circular(10),
-                                              bottomLeft: Radius.circular(10),
-                                              bottomRight: Radius.circular(10)),
-                                          boxShadow: [
-                                            BoxShadow(
-                                                color: Colors.grey
-                                                    .withOpacity(0.5),
-                                                spreadRadius: 5,
-                                                blurRadius: 7,
-                                                offset: const Offset(0, 3))
-                                          ]),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            height: 115,
-                                            width: 150,
-                                            padding: const EdgeInsets.only(
-                                                top: 15, left: 15, right: 15),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  DateFormat(
-                                                          'dd-MM-yyyy\nHH:mm:ss')
-                                                      .format(data[index].date),
-                                                  style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 14.0),
+                                  return InkWell(
+                                      onTap: () => {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        RefuelMapScreen(
+                                                          latitude: data[index]
+                                                              .latitude,
+                                                          longitude: data[index]
+                                                              .longitude,
+                                                        ))).then(
+                                                (_) => setState(() {}))
+                                          },
+                                      child: Container(
+                                          padding: const EdgeInsets.only(
+                                              top: 10, bottom: 10),
+                                          decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                      topLeft:
+                                                          Radius.circular(10),
+                                                      topRight:
+                                                          Radius.circular(10),
+                                                      bottomLeft:
+                                                          Radius.circular(10),
+                                                      bottomRight:
+                                                          Radius.circular(10)),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                    color: Colors.grey
+                                                        .withOpacity(0.5),
+                                                    spreadRadius: 5,
+                                                    blurRadius: 7,
+                                                    offset: const Offset(0, 3))
+                                              ]),
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                height: 115,
+                                                width: 150,
+                                                padding: const EdgeInsets.only(
+                                                    top: 15,
+                                                    left: 15,
+                                                    right: 15),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      DateFormat(
+                                                              'dd-MM-yyyy\nHH:mm:ss')
+                                                          .format(
+                                                              data[index].date),
+                                                      style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 14.0),
+                                                    ),
+                                                    Text(
+                                                      vehicleValue,
+                                                      style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 14.0),
+                                                    ),
+                                                    IconButton(
+                                                      icon: const Icon(
+                                                          EvaIcons.trash),
+                                                      onPressed: () {
+                                                        if (data[index].type ==
+                                                            "REFUEL") {
+                                                          refuelRepository
+                                                              .removeRefuel(
+                                                                  data[index]
+                                                                      .id);
+                                                          ScaffoldMessenger.of(
+                                                                  context)
+                                                              .showSnackBar(const SnackBar(
+                                                                  content: Text(
+                                                                      "Refuel deleted."),
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .green));
+                                                          setState(() {});
+                                                        } else if (data[index]
+                                                                .type ==
+                                                            "EXPENSE") {
+                                                          expanseRepository
+                                                              .removeExpense(
+                                                                  data[index]
+                                                                      .id);
+                                                          ScaffoldMessenger.of(
+                                                                  context)
+                                                              .showSnackBar(const SnackBar(
+                                                                  content: Text(
+                                                                      "Expense deleted."),
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .green));
+                                                          setState(() {});
+                                                        }
+                                                      },
+                                                    )
+                                                  ],
                                                 ),
-                                                Text(
-                                                  vehicleValue,
-                                                  style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 14.0),
-                                                ),
-                                                IconButton(
-                                                  icon: const Icon(
-                                                      EvaIcons.trash),
-                                                  onPressed: () {
+                                              ),
+                                              Container(
+                                                height: 100,
+                                                width: 240,
+                                                padding: const EdgeInsets.only(
+                                                    top: 15, left: 60),
+                                                child: Column(
+                                                  children: [
+                                                    Text(
+                                                      data[index]
+                                                              .odometer
+                                                              .toString() +
+                                                          " km",
+                                                      style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 14.0),
+                                                    ),
                                                     if (data[index].type ==
-                                                        "REFUEL") {
-                                                      refuelRepository
-                                                          .removeRefuel(
-                                                              data[index].id);
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(const SnackBar(
-                                                              content: Text(
-                                                                  "Refuel deleted."),
-                                                              backgroundColor:
-                                                                  Colors
-                                                                      .green));
-                                                      setState(() {});
-                                                    } else if (data[index]
-                                                            .type ==
-                                                        "EXPENSE") {
-                                                      expanseRepository
-                                                          .removeExpense(
-                                                              data[index].id);
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(const SnackBar(
-                                                              content: Text(
-                                                                  "Expense deleted."),
-                                                              backgroundColor:
-                                                                  Colors
-                                                                      .green));
-                                                      setState(() {});
-                                                    }
-                                                  },
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                          Container(
-                                            height: 100,
-                                            width: 240,
-                                            padding: const EdgeInsets.only(
-                                                top: 15, left: 60),
-                                            child: Column(
-                                              children: [
-                                                Text(
-                                                  data[index]
-                                                          .odometer
-                                                          .toString() +
-                                                      " km",
-                                                  style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 14.0),
-                                                ),
-                                                if (data[index].type ==
-                                                    "REFUEL") ...[
-                                                  Text(
-                                                    data[index].fuel + "l)",
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 14.0),
-                                                  ),
-                                                  Text(
-                                                    data[index].price + "zl/l",
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 14.0),
-                                                  )
-                                                ],
-                                                Text(
-                                                  data[index].totalCost,
-                                                  style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 14.0),
-                                                ),
-                                                if (data
-                                                            .where((element) =>
-                                                                element.type ==
-                                                                "REFUEL")
-                                                            .toList()
-                                                            .length >
-                                                        1 &&
-                                                    data
-                                                            .lastWhere(
-                                                                (element) =>
+                                                        "REFUEL") ...[
+                                                      Text(
+                                                        data[index].fuel + "l)",
+                                                        style: const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 14.0),
+                                                      ),
+                                                      Text(
+                                                        data[index].price +
+                                                            "zl/l",
+                                                        style: const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 14.0),
+                                                      )
+                                                    ],
+                                                    Text(
+                                                      data[index].totalCost,
+                                                      style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 14.0),
+                                                    ),
+                                                    if (data
+                                                                .where((element) =>
                                                                     element
                                                                         .type ==
                                                                     "REFUEL")
-                                                            .id !=
-                                                        data[index].id &&
-                                                    data[index].type ==
-                                                        "REFUEL") ...[
-                                                  Text(
-                                                    avg(
+                                                                .toList()
+                                                                .length >
+                                                            1 &&
+                                                        data
+                                                                .lastWhere(
+                                                                    (element) =>
+                                                                        element
+                                                                            .type ==
+                                                                        "REFUEL")
+                                                                .id !=
+                                                            data[index].id &&
+                                                        data[index].type ==
+                                                            "REFUEL") ...[
+                                                      Text(
+                                                        avg(
                                                                 data[index],
                                                                 data
                                                                     .sublist(
-                                                                        index + 1)
-                                                                    .firstWhere((element) =>
-                                                                        element
-                                                                            .type ==
-                                                                        "REFUEL"))
-                                                            .toStringAsFixed(
+                                                                        index +
+                                                                            1)
+                                                                    .firstWhere(
+                                                                        (element) =>
+                                                                            element.type ==
+                                                                            "REFUEL")).toStringAsFixed(
                                                                 2) +
-                                                        "l/100km",
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 14.0),
-                                                  )
-                                                ],
-                                                if (data[index].type ==
-                                                    "EXPENSE") ...[
-                                                  Text(
-                                                    data[index].note,
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 14.0),
-                                                  ),
-                                                ]
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      ));
+                                                            "l/100km",
+                                                        style: const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 14.0),
+                                                      )
+                                                    ],
+                                                    if (data[index].type ==
+                                                        "EXPENSE") ...[
+                                                      Text(
+                                                        data[index].note,
+                                                        style: const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 14.0),
+                                                      ),
+                                                    ]
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          )));
                                 }));
                       } else {
-                        return Container(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: ListView.separated(
-                                itemCount: data.length,
-                                separatorBuilder: (context, index) =>
-                                    const SizedBox(height: 4),
-                                itemBuilder: (BuildContext conext, int index) {
-                                  return Container(
-                                      padding: const EdgeInsets.only(
-                                          top: 10, bottom: 10),
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: const BorderRadius.only(
-                                              topLeft: Radius.circular(10),
-                                              topRight: Radius.circular(10),
-                                              bottomLeft: Radius.circular(10),
-                                              bottomRight: Radius.circular(10)),
-                                          boxShadow: [
-                                            BoxShadow(
-                                                color: Colors.grey
-                                                    .withOpacity(0.5),
-                                                spreadRadius: 5,
-                                                blurRadius: 7,
-                                                offset: const Offset(0, 3))
-                                          ]),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            height: 115,
-                                            width: 150,
-                                            padding: const EdgeInsets.only(
-                                                top: 15, left: 15, right: 15),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  DateFormat(
-                                                          'dd-MM-yyyy\nHH:mm:ss')
-                                                      .format(data[index].date),
-                                                  style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 14.0),
+                        return InkWell(
+                            child: Container(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: ListView.separated(
+                                    itemCount: data.length,
+                                    separatorBuilder: (context, index) =>
+                                        const SizedBox(height: 4),
+                                    itemBuilder:
+                                        (BuildContext conext, int index) {
+                                      return Container(
+                                          padding: const EdgeInsets.only(
+                                              top: 10, bottom: 10),
+                                          decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                      topLeft:
+                                                          Radius.circular(10),
+                                                      topRight:
+                                                          Radius.circular(10),
+                                                      bottomLeft:
+                                                          Radius.circular(10),
+                                                      bottomRight:
+                                                          Radius.circular(10)),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                    color: Colors.grey
+                                                        .withOpacity(0.5),
+                                                    spreadRadius: 5,
+                                                    blurRadius: 7,
+                                                    offset: const Offset(0, 3))
+                                              ]),
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                height: 115,
+                                                width: 150,
+                                                padding: const EdgeInsets.only(
+                                                    top: 15,
+                                                    left: 15,
+                                                    right: 15),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      DateFormat(
+                                                              'dd-MM-yyyy\nHH:mm:ss')
+                                                          .format(
+                                                              data[index].date),
+                                                      style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 14.0),
+                                                    ),
+                                                    Text(
+                                                      vehicleValue,
+                                                      style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 14.0),
+                                                    ),
+                                                    IconButton(
+                                                      icon: const Icon(
+                                                          EvaIcons.trash),
+                                                      onPressed: () {
+                                                        if (data[index].type ==
+                                                            "REFUEL") {
+                                                          refuelRepository
+                                                              .removeRefuel(
+                                                                  data[index]
+                                                                      .id);
+                                                          ScaffoldMessenger.of(
+                                                                  context)
+                                                              .showSnackBar(const SnackBar(
+                                                                  content: Text(
+                                                                      "Refuel deleted."),
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .green));
+                                                          setState(() {});
+                                                        } else if (data[index]
+                                                                .type ==
+                                                            "EXPENSE") {
+                                                          expanseRepository
+                                                              .removeExpense(
+                                                                  data[index]
+                                                                      .id);
+                                                          ScaffoldMessenger.of(
+                                                                  context)
+                                                              .showSnackBar(const SnackBar(
+                                                                  content: Text(
+                                                                      "Expense deleted."),
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .green));
+                                                          setState(() {});
+                                                        }
+                                                      },
+                                                    )
+                                                  ],
                                                 ),
-                                                Text(
-                                                  vehicleValue,
-                                                  style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 14.0),
-                                                ),
-                                                IconButton(
-                                                  icon: const Icon(
-                                                      EvaIcons.trash),
-                                                  onPressed: () {
+                                              ),
+                                              Container(
+                                                height: 100,
+                                                width: 240,
+                                                padding: const EdgeInsets.only(
+                                                    top: 15, left: 60),
+                                                child: Column(
+                                                  children: [
+                                                    Text(
+                                                      data[index]
+                                                              .odometer
+                                                              .toString() +
+                                                          " km",
+                                                      style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 14.0),
+                                                    ),
                                                     if (data[index].type ==
-                                                        "REFUEL") {
-                                                      refuelRepository
-                                                          .removeRefuel(
-                                                              data[index].id);
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(const SnackBar(
-                                                              content: Text(
-                                                                  "Refuel deleted."),
-                                                              backgroundColor:
-                                                                  Colors
-                                                                      .green));
-                                                      setState(() {});
-                                                    } else if (data[index]
-                                                            .type ==
-                                                        "EXPENSE") {
-                                                      expanseRepository
-                                                          .removeExpense(
-                                                              data[index].id);
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(const SnackBar(
-                                                              content: Text(
-                                                                  "Expense deleted."),
-                                                              backgroundColor:
-                                                                  Colors
-                                                                      .green));
-                                                      setState(() {});
-                                                    }
-                                                  },
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                          Container(
-                                            height: 100,
-                                            width: 240,
-                                            padding: const EdgeInsets.only(
-                                                top: 15, left: 60),
-                                            child: Column(
-                                              children: [
-                                                Text(
-                                                  data[index]
-                                                          .odometer
-                                                          .toString() +
-                                                      " km",
-                                                  style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 14.0),
-                                                ),
-                                                if (data[index].type ==
-                                                    "REFUEL") ...[
-                                                  Text(
-                                                    data[index].fuel + "kwh)",
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 14.0),
-                                                  ),
-                                                  Text(
-                                                    data[index].price +
-                                                        "zl/kwh",
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 14.0),
-                                                  )
-                                                ],
-                                                Text(
-                                                  data[index].totalCost,
-                                                  style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 14.0),
-                                                ),
-                                                if (data
-                                                            .where((element) =>
-                                                                element.type ==
-                                                                "REFUEL")
-                                                            .toList()
-                                                            .length >
-                                                        1 &&
-                                                    data
-                                                            .lastWhere(
-                                                                (element) =>
+                                                        "REFUEL") ...[
+                                                      Text(
+                                                        data[index].fuel +
+                                                            "kwh)",
+                                                        style: const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 14.0),
+                                                      ),
+                                                      Text(
+                                                        data[index].price +
+                                                            "zl/kwh",
+                                                        style: const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 14.0),
+                                                      )
+                                                    ],
+                                                    Text(
+                                                      data[index].totalCost,
+                                                      style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 14.0),
+                                                    ),
+                                                    if (data
+                                                                .where((element) =>
                                                                     element
                                                                         .type ==
                                                                     "REFUEL")
-                                                            .id !=
-                                                        data[index].id &&
-                                                    data[index].type ==
-                                                        "REFUEL") ...[
-                                                  Text(
-                                                    avg(
+                                                                .toList()
+                                                                .length >
+                                                            1 &&
+                                                        data
+                                                                .lastWhere(
+                                                                    (element) =>
+                                                                        element
+                                                                            .type ==
+                                                                        "REFUEL")
+                                                                .id !=
+                                                            data[index].id &&
+                                                        data[index].type ==
+                                                            "REFUEL") ...[
+                                                      Text(
+                                                        avg(
                                                                 data[index],
                                                                 data
                                                                     .sublist(
-                                                                        index + 1)
-                                                                    .firstWhere((element) =>
-                                                                        element
-                                                                            .type ==
-                                                                        "REFUEL"))
-                                                            .toStringAsFixed(
+                                                                        index +
+                                                                            1)
+                                                                    .firstWhere(
+                                                                        (element) =>
+                                                                            element.type ==
+                                                                            "REFUEL")).toStringAsFixed(
                                                                 2) +
-                                                        "kwh/100km",
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 14.0),
-                                                  )
-                                                ],
-                                                if (data[index].type ==
-                                                    "EXPENSE") ...[
-                                                  Text(
-                                                    data[index].note,
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 14.0),
-                                                  ),
-                                                ]
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      ));
-                                }));
+                                                            "kwh/100km",
+                                                        style: const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 14.0),
+                                                      )
+                                                    ],
+                                                    if (data[index].type ==
+                                                        "EXPENSE") ...[
+                                                      Text(
+                                                        data[index].note,
+                                                        style: const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 14.0),
+                                                      ),
+                                                    ]
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          ));
+                                    })));
                       }
                     } else if (snapshot.hasError) {
                       return Text("${snapshot.error}");
@@ -532,15 +576,17 @@ class _MainScreenState extends State<MainScreen> {
                       heroTag: "btn1",
                       onPressed: () {
                         Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => AddRefuelScreen(
-                                        refuelRepository: refuelRepository,
-                                        carName: vehicleValue,
-                                        vehicleType: vehicleType,
-                                        lastOdometer: lastOdometer,
-                                        atHome: false)))
-                            .then((_) => setState(() {}));
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AddRefuelScreen(
+                                      refuelRepository: refuelRepository,
+                                      carName: vehicleValue,
+                                      vehicleType: vehicleType,
+                                      lastOdometer: lastOdometer,
+                                      atHome: false,
+                                      latidiude: latidude,
+                                      longtitiude: longtitude,
+                                    ))).then((_) => setState(() {}));
                       },
                       icon: const Icon(Icons.add),
                       label: const Text('Add refuel'),

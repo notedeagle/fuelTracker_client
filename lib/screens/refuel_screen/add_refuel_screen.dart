@@ -12,6 +12,8 @@ class AddRefuelScreen extends StatelessWidget {
   final String vehicleType;
   final int lastOdometer;
   final bool atHome;
+  final double latidiude;
+  final double longtitiude;
 
   const AddRefuelScreen(
       {Key? key,
@@ -19,7 +21,9 @@ class AddRefuelScreen extends StatelessWidget {
       required this.carName,
       required this.vehicleType,
       required this.lastOdometer,
-      required this.atHome})
+      required this.atHome,
+      required this.latidiude,
+      required this.longtitiude})
       : super(key: key);
 
   @override
