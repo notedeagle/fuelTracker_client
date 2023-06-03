@@ -256,7 +256,7 @@ class _RefuelFormState extends State<RefuelElectricForm> {
                           borderRadius: BorderRadius.circular(30.0)),
                       contentPadding:
                           const EdgeInsets.only(left: 10.0, right: 10.0),
-                      labelText: "Price",
+                      labelText: "Amount",
                       hintStyle: const TextStyle(
                           fontSize: 12.0,
                           color: style.Colors.grey,
@@ -441,13 +441,13 @@ class _RefuelFormState extends State<RefuelElectricForm> {
                                       ))
                                     ],
                                   )
-                                : RaisedButton(
-                                    color: style.Colors.mainColor,
-                                    disabledColor: style.Colors.mainColor,
-                                    disabledTextColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30.0),
-                                    ),
+                                : ElevatedButton(
+                                    // color: style.Colors.mainColor,
+                                    // disabledColor: style.Colors.mainColor,
+                                    // disabledTextColor: Colors.white,
+                                    // shape: RoundedRectangleBorder(
+                                    //   borderRadius: BorderRadius.circular(30.0),
+                                    // ),
                                     onPressed: _onAddButtonPressed,
                                     child: const Text("ADD",
                                         style: TextStyle(
@@ -484,13 +484,13 @@ class _RefuelFormState extends State<RefuelElectricForm> {
                                       ))
                                     ],
                                   )
-                                : RaisedButton(
-                                    color: style.Colors.mainColor,
-                                    disabledColor: style.Colors.mainColor,
-                                    disabledTextColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30.0),
-                                    ),
+                                : ElevatedButton(
+                                    // color: style.Colors.mainColor,
+                                    // disabledColor: style.Colors.mainColor,
+                                    // disabledTextColor: Colors.white,
+                                    // shape: RoundedRectangleBorder(
+                                    //   borderRadius: BorderRadius.circular(30.0),
+                                    // ),
                                     onPressed: () {
                                       Navigator.push(
                                           context,

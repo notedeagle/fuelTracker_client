@@ -3,9 +3,8 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_tracker_client/dto/expense_dto.dart';
-import 'package:flutter_tracker_client/dto/mapper.dart';
 import 'package:flutter_tracker_client/dto/refuel_dto.dart';
+import 'package:flutter_tracker_client/dto/reports_dto.dart';
 import 'package:flutter_tracker_client/dto/view_dto.dart';
 import 'package:flutter_tracker_client/repositories/repositories.dart';
 import 'package:flutter_tracker_client/screens/vahicle_screen/vehicle_screen.dart';
@@ -29,6 +28,7 @@ class RaportScreen extends StatefulWidget {
 }
 
 class _RaportScreenState extends State<RaportScreen> {
+  var reportsRepository = ReportRepository();
   var refuelRepository = RefuelRepository();
   String carName;
   String vehicleType;
@@ -200,12 +200,11 @@ class _RaportScreenState extends State<RaportScreen> {
                 title: const Center(child: Text("Raports"))),
             body: TabBarView(
               children: [
-                FutureBuilder<List<ViewDto>>(
-                    future: Mapper().getViewListByVehicleName(carName),
+                FutureBuilder<ReportsDto>(
+                    future: reportsRepository.getReportsByCarName(carName),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        List<ViewDto>? data = snapshot.data;
-                        data!.sort((a, b) => a.date.compareTo(b.date));
+                        ReportsDto? data = snapshot.data;
                         return SingleChildScrollView(
                           child: Column(
                             children: [
@@ -230,10 +229,10 @@ class _RaportScreenState extends State<RaportScreen> {
                                     top: 15, left: 15, right: 15),
                                 child: Center(
                                     child: Text(DateFormat('dd-MM-yyyy')
-                                            .format(data.first.date) +
+                                            .format(data!.startDate) +
                                         " - " +
                                         DateFormat('dd-MM-yyyy')
-                                            .format(data.last.date))),
+                                            .format(data.endDate))),
                               ),
                               const SizedBox(
                                 height: 5,
@@ -290,7 +289,7 @@ class _RaportScreenState extends State<RaportScreen> {
                                                 height: 10,
                                               ),
                                               AutoSizeText(
-                                                sumCostView(data)
+                                                data.totalCost
                                                         .toStringAsFixed(2) +
                                                     "zl",
                                                 style: const TextStyle(
@@ -316,7 +315,7 @@ class _RaportScreenState extends State<RaportScreen> {
                                               height: 10,
                                             ),
                                             AutoSizeText(
-                                              perDayView(data)
+                                              data.costPerDay
                                                       .toStringAsFixed(2) +
                                                   "zl",
                                               style: const TextStyle(
@@ -342,7 +341,7 @@ class _RaportScreenState extends State<RaportScreen> {
                                                 height: 10,
                                               ),
                                               AutoSizeText(
-                                                perKmView(data)
+                                                data.costPerKm
                                                         .toStringAsFixed(2) +
                                                     "zl",
                                                 style: const TextStyle(
@@ -384,7 +383,7 @@ class _RaportScreenState extends State<RaportScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     const Text(
-                                      "Odleglosc",
+                                      "Distance",
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 14.0),
@@ -398,6 +397,9 @@ class _RaportScreenState extends State<RaportScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       children: [
+                                        const SizedBox(
+                                          width: 50,
+                                        ),
                                         FittedBox(
                                           fit: BoxFit.fitWidth,
                                           child: Column(
@@ -413,7 +415,7 @@ class _RaportScreenState extends State<RaportScreen> {
                                                 height: 10,
                                               ),
                                               AutoSizeText(
-                                                sumTotalKm(data)
+                                                data.totalDistance
                                                         .toStringAsFixed(2) +
                                                     "km",
                                                 style: const TextStyle(
@@ -439,7 +441,7 @@ class _RaportScreenState extends State<RaportScreen> {
                                               height: 10,
                                             ),
                                             AutoSizeText(
-                                              kmPerDayView(data)
+                                              data.distancePerDay
                                                       .toStringAsFixed(2) +
                                                   "km",
                                               style: const TextStyle(
@@ -489,14 +491,17 @@ class _RaportScreenState extends State<RaportScreen> {
                                           fontSize: 14.0)),
                                   primaryXAxis: CategoryAxis(),
                                   series: <ChartSeries>[
-                                    ColumnSeries<ViewDto, String>(
-                                        dataSource: data,
-                                        xValueMapper: (ViewDto view, _) =>
-                                            DateFormat.MMMM().format(view.date),
-                                        yValueMapper: (ViewDto view, _) =>
-                                            double.parse(view.totalCost
-                                                .substring(0,
-                                                    view.totalCost.length - 2)))
+                                    ColumnSeries<CostPerMonth, String>(
+                                        dataSource:
+                                            data.costPerMonth.reversed.toList(),
+                                        dataLabelSettings:
+                                            const DataLabelSettings(
+                                                isVisible: true),
+                                        xValueMapper: (CostPerMonth view, _) =>
+                                            DateFormat.MMMM().format(
+                                                DateTime(0, view.monthNumber)),
+                                        yValueMapper: (CostPerMonth view, _) =>
+                                            view.totalCost)
                                   ],
                                 ),
                               )
@@ -966,27 +971,48 @@ class _RaportScreenState extends State<RaportScreen> {
                                               offset: const Offset(0, 3))
                                         ]),
                                     height: 240,
-                                    // width: 390,
                                     padding: const EdgeInsets.only(
                                         top: 15, left: 15, right: 15),
-                                    child: SfCartesianChart(
-                                      title: ChartTitle(
-                                          text: "Month total cost",
-                                          textStyle: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14.0)),
-                                      primaryXAxis: CategoryAxis(),
-                                      series: <ChartSeries>[
-                                        ColumnSeries<RefuelDto, String>(
-                                            dataSource: data,
-                                            xValueMapper:
-                                                (RefuelDto refuel, _) =>
-                                                    DateFormat.MMMM()
-                                                        .format(refuel.date),
-                                            yValueMapper:
-                                                (RefuelDto refuel, _) =>
-                                                    refuel.totalCost)
-                                      ],
+                                    child: FutureBuilder<ReportsDto>(
+                                      future: reportsRepository
+                                          .getReportsByCarName(carName),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.hasData) {
+                                          ReportsDto? data = snapshot.data;
+                                          return SfCartesianChart(
+                                            title: ChartTitle(
+                                                text: "Month total cost",
+                                                textStyle: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 14.0)),
+                                            primaryXAxis: CategoryAxis(),
+                                            series: <ChartSeries>[
+                                              ColumnSeries<CostPerMonth,
+                                                      String>(
+                                                  dataSource: data!
+                                                      .costPerMonth.reversed
+                                                      .toList(),
+                                                  dataLabelSettings:
+                                                      const DataLabelSettings(
+                                                          isVisible: true),
+                                                  xValueMapper: (CostPerMonth
+                                                              view,
+                                                          _) =>
+                                                      DateFormat.MMMM().format(
+                                                          DateTime(
+                                                              0,
+                                                              view
+                                                                  .monthNumber)),
+                                                  yValueMapper:
+                                                      (CostPerMonth view, _) =>
+                                                          view.totalCost)
+                                            ],
+                                          );
+                                        } else if (snapshot.hasData) {
+                                          return Text("${snapshot.error}");
+                                        }
+                                        return const CircularProgressIndicator();
+                                      },
                                     ),
                                   ),
                                   const SizedBox(
@@ -1021,10 +1047,17 @@ class _RaportScreenState extends State<RaportScreen> {
                                       primaryXAxis: CategoryAxis(),
                                       primaryYAxis: NumericAxis(
                                           numberFormat: NumberFormat("###.00"),
-                                          interval: 0.1),
+                                          rangePadding:
+                                              ChartRangePadding.additional),
                                       series: <ChartSeries>[
                                         LineSeries<RefuelDto, String>(
                                             dataSource: data,
+                                            dataLabelSettings:
+                                                const DataLabelSettings(
+                                                    isVisible: true),
+                                            markerSettings:
+                                                const MarkerSettings(
+                                                    isVisible: true),
                                             xValueMapper:
                                                 (RefuelDto refuel, _) =>
                                                     DateFormat('dd-MM')
@@ -1032,6 +1065,62 @@ class _RaportScreenState extends State<RaportScreen> {
                                             yValueMapper:
                                                 (RefuelDto refuel, _) =>
                                                     refuel.price)
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: const BorderRadius.only(
+                                            topLeft: Radius.circular(10),
+                                            topRight: Radius.circular(10),
+                                            bottomLeft: Radius.circular(10),
+                                            bottomRight: Radius.circular(10)),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color:
+                                                  Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 5,
+                                              blurRadius: 7,
+                                              offset: const Offset(0, 3))
+                                        ]),
+                                    height: 240,
+                                    // width: 390,
+                                    padding: const EdgeInsets.only(
+                                        top: 15, left: 15, right: 15),
+                                    child: SfCartesianChart(
+                                      title: ChartTitle(
+                                          text: "Avg fuel consumption",
+                                          textStyle: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14.0)),
+                                      primaryXAxis: CategoryAxis(),
+                                      primaryYAxis: NumericAxis(
+                                          numberFormat: NumberFormat("###.00"),
+                                          rangePadding:
+                                              ChartRangePadding.additional),
+                                      series: <ChartSeries>[
+                                        LineSeries<RefuelDto, String>(
+                                            dataSource: data
+                                                .where(
+                                                    (x) => data.indexOf(x) != 0)
+                                                .toList(),
+                                            dataLabelSettings:
+                                                const DataLabelSettings(
+                                                    isVisible: true),
+                                            markerSettings:
+                                                const MarkerSettings(
+                                                    isVisible: true),
+                                            xValueMapper:
+                                                (RefuelDto refuel, _) =>
+                                                    DateFormat('dd-MM')
+                                                        .format(refuel.date),
+                                            yValueMapper:
+                                                (RefuelDto refuel, _) =>
+                                                    refuel.avg),
                                       ],
                                     ),
                                   ),

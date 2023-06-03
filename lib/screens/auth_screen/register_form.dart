@@ -359,13 +359,13 @@ class _RegisterFormState extends State<RegisterForm> {
                                       ))
                                     ],
                                   )
-                                : RaisedButton(
-                                    color: style.Colors.mainColor,
-                                    disabledColor: style.Colors.mainColor,
-                                    disabledTextColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30.0),
-                                    ),
+                                : ElevatedButton(
+                                    // color: style.Colors.mainColor,
+                                    // disabledColor: style.Colors.mainColor,
+                                    // disabledTextColor: Colors.white,
+                                    // shape: RoundedRectangleBorder(
+                                    //   borderRadius: BorderRadius.circular(30.0),
+                                    // ),
                                     onPressed: _onRegisterButtonPressed,
                                     child: const Text("REGISTER",
                                         style: TextStyle(

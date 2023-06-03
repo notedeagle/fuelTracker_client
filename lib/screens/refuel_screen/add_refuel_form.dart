@@ -445,13 +445,13 @@ class _RefuelFormState extends State<RefuelForm> {
                                       ))
                                     ],
                                   )
-                                : RaisedButton(
-                                    color: style.Colors.mainColor,
-                                    disabledColor: style.Colors.mainColor,
-                                    disabledTextColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30.0),
-                                    ),
+                                : ElevatedButton(
+                                    // color: style.Colors.mainColor,
+                                    // disabledColor: style.Colors.mainColor,
+                                    // disabledTextColor: Colors.white,
+                                    // shape: RoundedRectangleBorder(
+                                    //   borderRadius: BorderRadius.circular(30.0),
+                                    // ),
                                     onPressed: _onAddButtonPressed,
                                     child: const Text("ADD",
                                         style: TextStyle(

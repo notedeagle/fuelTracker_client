@@ -5,17 +5,20 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_tracker_client/dto/expense_dto.dart';
 import 'package:flutter_tracker_client/dto/refuel_dto.dart';
+import 'package:flutter_tracker_client/dto/reports_dto.dart';
 import 'package:flutter_tracker_client/dto/vehicle_dto.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
-String mainUrl = "http://localhost:8081";
+import '../bloc/auth_bloc/auth_event.dart';
+
+String mainUrl = "http://localhost:8080";
 final Dio _dio = Dio();
 const FlutterSecureStorage storage = FlutterSecureStorage();
 
 class UserRepository {
-  var loginUrl = '$mainUrl/login';
-  var registerUrl = '$mainUrl/register';
+  var loginUrl = '$mainUrl/auth/login';
+  var registerUrl = '$mainUrl/auth/register';
 
   Future<bool> hasToken() async {
     var value = await storage.read(key: 'token');
@@ -27,7 +30,8 @@ class UserRepository {
   }
 
   Future<void> persistToken(String token) async {
-    await storage.write(key: 'token', value: token);
+    var tokenType = "Bearer ";
+    await storage.write(key: 'token', value: tokenType + token);
   }
 
   Future<void> deleteToken() async {
@@ -35,12 +39,13 @@ class UserRepository {
     storage.deleteAll();
   }
 
-  Future<String> login(String email, String password) async {
+  Future<String> login(String login, String password) async {
     Response response = await _dio.post(loginUrl, data: {
-      "email": email,
+      "username": login,
       "password": password,
     });
-    return response.headers.value(HttpHeaders.authorizationHeader).toString();
+
+    return response.data['access_token'];
   }
 
   Future<Response> register(String email, String firstName, String lastName,
@@ -156,6 +161,8 @@ class RefuelRepository {
 class VehicleRepository {
   var customerVehicles = '$mainUrl/vehicle';
 
+  var userRepository = UserRepository();
+
   Future<List<VehicleDto>> getCustomerVehicles() async {
     var token = await storage.read(key: 'token');
 
@@ -168,6 +175,8 @@ class VehicleRepository {
     } else if (response.statusCode == 204) {
       return List.empty();
     } else {
+      userRepository.deleteToken();
+      LoggedOut;
       throw Exception("Error.");
     }
   }
@@ -261,5 +270,23 @@ class ExpenseRepository {
 
     await http.delete(Uri.parse('$expenseUri/$id'),
         headers: {HttpHeaders.authorizationHeader: "$token"});
+  }
+}
+
+class ReportRepository {
+  var reportUri = '$mainUrl/totalCost';
+
+  Future<ReportsDto> getReportsByCarName(String carName) async {
+    var token = await storage.read(key: 'token');
+
+    final response = await http.get(Uri.parse('$reportUri/$carName'),
+        headers: {HttpHeaders.authorizationHeader: "$token"});
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+      return ReportsDto.fromJson(jsonResponse);
+    } else {
+      throw Exception("Error occured");
+    }
   }
 }

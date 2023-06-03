@@ -5,18 +5,18 @@ abstract class LoginEvent extends Equatable {
 }
 
 class LoginButtonPressed extends LoginEvent {
-  final String email;
+  final String login;
   final String password;
 
   const LoginButtonPressed({
-    required this.email,
+    required this.login,
     required this.password,
   });
 
   @override
-  List<Object> get props => [email, password];
+  List<Object> get props => [login, password];
 
   @override
   String toString() =>
-      'LoginButtonPressed { username: $email, password: $password }';
+      'LoginButtonPressed { username: $login, password: $password }';
 }
